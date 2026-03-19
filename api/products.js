@@ -1,6 +1,6 @@
-import { sql } from '@vercel/postgres';
+const { sql } = require('@vercel/postgres');
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   // Enable CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
@@ -36,7 +36,7 @@ export default async function handler(req, res) {
       
       await sql`
         INSERT INTO products (id, name, category, price, stock, description, image)
-        VALUES (${id}, ${name}, ${category}, ${price}, ${stock}, ${description}, ${image || '/images/placeholder.jpg'})
+        VALUES (${id}, ${name}, ${category}, ${price}, ${stock}, ${description || ''}, ${image || '/images/placeholder.jpg'})
       `;
       
       const { rows } = await sql`SELECT * FROM products WHERE id = ${id}`;
@@ -50,7 +50,7 @@ export default async function handler(req, res) {
       await sql`
         UPDATE products 
         SET name = ${name}, category = ${category}, price = ${price}, 
-            stock = ${stock}, description = ${description}, image = ${image}
+            stock = ${stock}, description = ${description || ''}, image = ${image}
         WHERE id = ${id}
       `;
       
@@ -68,4 +68,4 @@ export default async function handler(req, res) {
     console.error('Database error:', error);
     return res.status(500).json({ error: error.message });
   }
-}
+};

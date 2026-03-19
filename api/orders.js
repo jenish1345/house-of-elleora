@@ -1,6 +1,6 @@
-import { sql } from '@vercel/postgres';
+const { sql } = require('@vercel/postgres');
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   // Enable CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT');
@@ -53,8 +53,8 @@ export default async function handler(req, res) {
           landmark: row.landmark
         },
         items: row.items,
-        subtotal: parseFloat(row.subtotal),
-        deliveryCharges: parseFloat(row.delivery_charges),
+        subtotal: parseFloat(row.subtotal || 0),
+        deliveryCharges: parseFloat(row.delivery_charges || 0),
         total: parseFloat(row.total),
         status: row.status,
         createdAt: row.created_at
@@ -97,4 +97,4 @@ export default async function handler(req, res) {
     console.error('Database error:', error);
     return res.status(500).json({ error: error.message });
   }
-}
+};
