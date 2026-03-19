@@ -44,34 +44,54 @@ function displayProducts() {
 document.getElementById('productForm').addEventListener('submit', async (e) => {
   e.preventDefault();
   
-  const formData = new FormData();
-  formData.append('name', document.getElementById('name').value);
-  formData.append('category', document.getElementById('category').value);
-  formData.append('price', document.getElementById('price').value);
-  formData.append('stock', document.getElementById('stock').value);
-  formData.append('description', document.getElementById('description').value);
-  
+  const name = document.getElementById('name').value;
+  const category = document.getElementById('category').value;
+  const price = document.getElementById('price').value;
+  const stock = document.getElementById('stock').value;
+  const description = document.getElementById('description').value;
   const imageFile = document.getElementById('image').files[0];
+  
+  let imageData = '/images/placeholder.jpg';
+  
+  // Convert image to base64 if uploaded
   if (imageFile) {
-    formData.append('image', imageFile);
+    imageData = await new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result);
+      reader.readAsDataURL(imageFile);
+    });
   }
 
   try {
-    const url = editingId ? `/api/products/${editingId}` : '/api/products';
+    const url = editingId ? `/api/products?id=${editingId}` : '/api/products';
     const method = editingId ? 'PUT' : 'POST';
     
     const response = await fetch(url, {
       method: method,
-      body: formData
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        name,
+        category,
+        price: parseFloat(price),
+        stock: parseInt(stock),
+        description,
+        image: imageData
+      })
     });
 
     if (response.ok) {
       alert(editingId ? 'Product updated successfully!' : 'Product added successfully!');
       resetForm();
       loadProducts();
+    } else {
+      const error = await response.json();
+      alert('Error: ' + (error.error || 'Failed to save product'));
     }
   } catch (error) {
     alert('Error saving product: ' + error.message);
+    console.error('Error:', error);
   }
 });
 
@@ -99,13 +119,15 @@ async function deleteProduct(id) {
   if (!confirm('Are you sure you want to delete this product?')) return;
 
   try {
-    const response = await fetch(`/api/products/${id}`, {
+    const response = await fetch(`/api/products?id=${id}`, {
       method: 'DELETE'
     });
 
     if (response.ok) {
       alert('Product deleted successfully!');
       loadProducts();
+    } else {
+      alert('Error deleting product');
     }
   } catch (error) {
     alert('Error deleting product: ' + error.message);
@@ -196,7 +218,7 @@ function displayOrders(orders) {
 
 async function updateOrderStatus(orderId, status) {
   try {
-    const response = await fetch(`/api/orders/${orderId}`, {
+    const response = await fetch(`/api/orders?orderId=${orderId}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ status })
