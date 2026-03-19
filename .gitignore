@@ -6,3 +6,7 @@ orders.json
 .DS_Store
 .env
 .vercel
+ADMIN_CREDENTIALS.txt
+NOTIFICATIONS_GUIDE.md
+SETUP.md
+START_HERE.md

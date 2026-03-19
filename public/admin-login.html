@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Login - House of Elleora</title>
+  <link rel="stylesheet" href="admin-style.css">
+</head>
+<body>
+  <div class="login-container">
+    <div class="login-box">
+      <h1>🛍️ House of Elleora</h1>
+      <h2>Admin Login</h2>
+      <form id="loginForm">
+        <div class="form-group">
+          <label>Username</label>
+          <input type="text" id="username" required>
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="password" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Login</button>
+      </form>
+      <p class="error-message" id="errorMessage"></p>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('loginForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+      
+      // Simple authentication (change these credentials!)
+      if (username === 'elleora' && password === 'elleora2026') {
+        localStorage.setItem('adminAuth', 'true');
+        window.location.href = 'admin.html';
+      } else {
+        document.getElementById('errorMessage').textContent = 'Invalid username or password';
+      }
+    });
+  </script>
+
+  <style>
+    .login-container {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    .login-box {
+      background: white;
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 10px 50px rgba(0,0,0,0.2);
+      width: 90%;
+      max-width: 400px;
+      text-align: center;
+    }
+
+    .login-box h1 {
+      color: #d97398;
+      margin-bottom: 10px;
+    }
+
+    .login-box h2 {
+      color: #333;
+      margin-bottom: 30px;
+    }
+
+    .error-message {
+      color: #dc3545;
+      margin-top: 15px;
+      font-weight: 600;
+    }
+  </style>
+</body>
+</html>

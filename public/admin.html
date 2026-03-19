@@ -7,6 +7,13 @@
   <link rel="stylesheet" href="admin-style.css">
 </head>
 <body>
+  <script>
+    // Check authentication
+    if (localStorage.getItem('adminAuth') !== 'true') {
+      window.location.href = 'admin-login.html';
+    }
+  </script>
+
   <header>
     <div class="container">
       <h1>🛍️ Admin Panel</h1>
@@ -14,7 +21,10 @@
       <div class="notification-badge" id="newOrderBadge" style="display: none;">
         🔔 New Orders!
       </div>
-      <a href="index.html" class="view-shop-btn">View Shop</a>
+      <div class="header-actions">
+        <a href="index.html" class="view-shop-btn">View Shop</a>
+        <button onclick="logout()" class="logout-btn">Logout</button>
+      </div>
     </div>
   </header>
 

@@ -277,3 +277,10 @@ setInterval(loadOrdersWithNotification, 30000);
 
 // Initial load with notification setup
 loadOrdersWithNotification();
+
+
+// Logout function
+function logout() {
+  localStorage.removeItem('adminAuth');
+  window.location.href = 'admin-login.html';
+}
