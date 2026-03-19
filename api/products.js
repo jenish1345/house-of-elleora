@@ -1,4 +1,4 @@
-const { sql } = require('@vercel/postgres');
+const { createPool } = require('@vercel/postgres');
 
 module.exports = async function handler(req, res) {
   // Enable CORS
@@ -11,8 +11,12 @@ module.exports = async function handler(req, res) {
   }
 
   try {
+    const pool = createPool({
+      connectionString: process.env.POSTGRES_URL
+    });
+
     // Create table if not exists
-    await sql`
+    await pool.sql`
       CREATE TABLE IF NOT EXISTS products (
         id TEXT PRIMARY KEY,
         name TEXT NOT NULL,
@@ -26,7 +30,7 @@ module.exports = async function handler(req, res) {
     `;
 
     if (req.method === 'GET') {
-      const { rows } = await sql`SELECT * FROM products ORDER BY created_at DESC`;
+      const { rows } = await pool.sql`SELECT * FROM products ORDER BY created_at DESC`;
       return res.status(200).json(rows);
     }
 
@@ -34,12 +38,12 @@ module.exports = async function handler(req, res) {
       const { name, category, price, stock, description, image } = req.body;
       const id = Date.now().toString();
       
-      await sql`
+      await pool.sql`
         INSERT INTO products (id, name, category, price, stock, description, image)
         VALUES (${id}, ${name}, ${category}, ${price}, ${stock}, ${description || ''}, ${image || '/images/placeholder.jpg'})
       `;
       
-      const { rows } = await sql`SELECT * FROM products WHERE id = ${id}`;
+      const { rows } = await pool.sql`SELECT * FROM products WHERE id = ${id}`;
       return res.status(200).json(rows[0]);
     }
 
@@ -47,25 +51,25 @@ module.exports = async function handler(req, res) {
       const { id } = req.query;
       const { name, category, price, stock, description, image } = req.body;
       
-      await sql`
+      await pool.sql`
         UPDATE products 
         SET name = ${name}, category = ${category}, price = ${price}, 
             stock = ${stock}, description = ${description || ''}, image = ${image}
         WHERE id = ${id}
       `;
       
-      const { rows } = await sql`SELECT * FROM products WHERE id = ${id}`;
+      const { rows } = await pool.sql`SELECT * FROM products WHERE id = ${id}`;
       return res.status(200).json(rows[0]);
     }
 
     if (req.method === 'DELETE') {
       const { id } = req.query;
-      await sql`DELETE FROM products WHERE id = ${id}`;
+      await pool.sql`DELETE FROM products WHERE id = ${id}`;
       return res.status(200).json({ success: true });
     }
 
   } catch (error) {
     console.error('Database error:', error);
-    return res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: error.message, details: error.toString() });
   }
 };

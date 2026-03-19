@@ -1,4 +1,4 @@
-const { sql } = require('@vercel/postgres');
+const { createPool } = require('@vercel/postgres');
 
 module.exports = async function handler(req, res) {
   // Enable CORS
@@ -11,8 +11,12 @@ module.exports = async function handler(req, res) {
   }
 
   try {
+    const pool = createPool({
+      connectionString: process.env.POSTGRES_URL
+    });
+
     // Create table if not exists
-    await sql`
+    await pool.sql`
       CREATE TABLE IF NOT EXISTS orders (
         order_id TEXT PRIMARY KEY,
         customer_name TEXT NOT NULL,
@@ -34,7 +38,7 @@ module.exports = async function handler(req, res) {
     `;
 
     if (req.method === 'GET') {
-      const { rows } = await sql`SELECT * FROM orders ORDER BY created_at DESC`;
+      const { rows } = await pool.sql`SELECT * FROM orders ORDER BY created_at DESC`;
       
       // Format orders to match frontend structure
       const formattedOrders = rows.map(row => ({
@@ -67,7 +71,7 @@ module.exports = async function handler(req, res) {
       const { customer, address, items, subtotal, deliveryCharges, total } = req.body;
       const orderId = 'ORD' + Date.now();
       
-      await sql`
+      await pool.sql`
         INSERT INTO orders (
           order_id, customer_name, customer_phone, customer_email,
           address_line1, address_line2, city, state, pincode, landmark,
@@ -87,9 +91,9 @@ module.exports = async function handler(req, res) {
       const { orderId } = req.query;
       const { status } = req.body;
       
-      await sql`UPDATE orders SET status = ${status} WHERE order_id = ${orderId}`;
+      await pool.sql`UPDATE orders SET status = ${status} WHERE order_id = ${orderId}`;
       
-      const { rows } = await sql`SELECT * FROM orders WHERE order_id = ${orderId}`;
+      const { rows } = await pool.sql`SELECT * FROM orders WHERE order_id = ${orderId}`;
       return res.status(200).json(rows[0]);
     }
 
