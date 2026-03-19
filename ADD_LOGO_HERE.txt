@@ -1,0 +1,19 @@
+📸 HOW TO ADD YOUR LOGO:
+
+1. Save the logo image you shared (the pink circular one with "House of Elleora")
+
+2. Rename it to: logo.png
+
+3. Copy it to the "public" folder in this project
+
+4. Replace the existing "logo.png" file
+
+5. Refresh the website - your logo will appear!
+
+The logo will show in:
+- Top left corner of the website (navigation bar)
+- Next to "House of Elleora" text
+
+Recommended logo size: 200x200 pixels or larger (square format works best)
+
+That's it! 🎉
