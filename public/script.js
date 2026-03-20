@@ -266,7 +266,7 @@ document.getElementById('checkoutForm').addEventListener('submit', async (e) => 
       const result = await response.json();
       
       // Payment details
-      const upiId = 'antonyjenish1345@okhdfcbank';
+      const upiId = '9488639502@ibl';
       const name = 'House of Elleora';
       const amount = total.toFixed(2);
       const note = `Order ${result.orderId}`;
@@ -317,6 +317,12 @@ function showPaymentModal(orderId, amount, upiId, deliveryFee) {
           <span class="payment-icon">💳</span>
           Pay with Paytm
         </button>
+        
+        <div class="qr-code-section">
+          <p><strong>Or scan QR code:</strong></p>
+          <img src="/images/payment-qr.jpg" alt="Payment QR Code" class="payment-qr" />
+          <p class="qr-name">ANTONY JEYAKUMAR</p>
+        </div>
         
         <div class="manual-payment">
           <p><strong>Or pay manually:</strong></p>

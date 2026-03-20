@@ -1059,3 +1059,33 @@ input:focus, select:focus, textarea:focus {
   cursor: pointer;
   font-weight: 600;
 }
+
+
+.qr-code-section {
+  margin: 20px 0;
+  padding: 20px;
+  background: white;
+  border-radius: 10px;
+  border: 2px solid var(--primary);
+}
+
+.qr-code-section p {
+  margin-bottom: 15px;
+  font-weight: 600;
+}
+
+.payment-qr {
+  max-width: 250px;
+  width: 100%;
+  height: auto;
+  border: 3px solid var(--primary);
+  border-radius: 10px;
+  margin: 10px 0;
+}
+
+.qr-name {
+  color: var(--primary);
+  font-weight: 700;
+  font-size: 1.1em;
+  margin-top: 10px;
+}
