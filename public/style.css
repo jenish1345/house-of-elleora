@@ -884,3 +884,12 @@ input:focus, select:focus, textarea:focus {
   padding: 10px 0;
   border-bottom: 1px solid #ddd;
 }
+
+
+.delivery-info {
+  text-align: center;
+  color: var(--primary);
+  font-weight: 600;
+  margin-top: 10px;
+  font-size: 0.95em;
+}

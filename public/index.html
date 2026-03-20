@@ -125,11 +125,6 @@
         <div class="form-section">
           <h4>Delivery Address</h4>
           <div class="form-group">
-            <label>City *</label>
-            <input type="text" id="city" required>
-            <small class="delivery-note">📦 Delivery charges: FREE in Tuticorin | ₹40 outside Tuticorin</small>
-          </div>
-          <div class="form-group">
             <label>Address Line 1 *</label>
             <input type="text" id="address1" required>
           </div>
@@ -139,24 +134,30 @@
           </div>
           <div class="form-row">
             <div class="form-group">
+              <label>City *</label>
+              <input type="text" id="city" required>
+            </div>
+            <div class="form-group">
               <label>State *</label>
               <input type="text" id="state" required>
             </div>
+          </div>
+          <div class="form-row">
             <div class="form-group">
               <label>PIN Code *</label>
               <input type="text" id="pincode" required pattern="[0-9]{6}">
             </div>
-          </div>
-          <div class="form-group">
-            <label>Landmark</label>
-            <input type="text" id="landmark">
+            <div class="form-group">
+              <label>Landmark</label>
+              <input type="text" id="landmark">
+            </div>
           </div>
         </div>
 
         <div class="order-summary">
           <h4>Order Summary</h4>
           <div id="orderSummary"></div>
-          <div class="summary-item" id="deliveryChargeRow" style="display: none;">
+          <div class="summary-item" id="deliveryChargeRow">
             <span>Delivery Charges</span>
             <span id="deliveryCharge">₹40</span>
           </div>
@@ -164,16 +165,13 @@
             <span>Total Amount:</span>
             <span class="final-amount">₹0</span>
           </div>
+          <p class="delivery-info">💝 Free delivery on orders above ₹1000!</p>
         </div>
 
         <div class="policies">
           <div class="policy-item">
             <span class="policy-icon">❌</span>
             <span>No Cash on Delivery (COD) - Online payment only</span>
-          </div>
-          <div class="policy-item">
-            <span class="policy-icon">🔄</span>
-            <span>Returns accepted within 7 days of delivery</span>
           </div>
           <div class="policy-item">
             <span class="policy-icon">✅</span>
@@ -225,10 +223,9 @@
         </div>
         <div class="footer-section">
           <h4>Policies</h4>
-          <p>📦 Free delivery in Tuticorin</p>
-          <p>📦 ₹40 delivery outside Tuticorin</p>
+          <p>📦 ₹40 delivery charges</p>
+          <p>💝 Free delivery above ₹1000</p>
           <p>❌ No Cash on Delivery</p>
-          <p>🔄 7-day return policy</p>
         </div>
         <div class="footer-section">
           <h4>Follow Us</h4>

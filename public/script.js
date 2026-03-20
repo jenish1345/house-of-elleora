@@ -186,30 +186,28 @@ function openCheckout() {
   overlay.classList.add('active');
   toggleCart();
   
-  // Add city change listener for delivery charges
-  document.getElementById('city').addEventListener('input', updateDeliveryCharges);
+  // Update delivery charges based on cart total
+  updateDeliveryCharges();
 }
 
-// Update delivery charges based on city
+// Update delivery charges based on cart total
 function updateDeliveryCharges() {
-  const city = document.getElementById('city').value.toLowerCase().trim();
   const deliveryChargeRow = document.getElementById('deliveryChargeRow');
   const deliveryCharge = document.getElementById('deliveryCharge');
   const finalAmount = document.querySelector('.final-amount');
   const payAmount = document.getElementById('payAmount');
   
   const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-  let deliveryFee = 0;
   
-  // Check if city is Tuticorin (various spellings)
-  const isTuticorin = city.includes('tuticorin') || city.includes('thoothukudi') || city.includes('tuti');
+  // Free delivery for orders above ₹1000
+  const deliveryFee = subtotal >= 1000 ? 0 : 40;
   
-  if (!isTuticorin && city.length > 0) {
-    deliveryFee = 40;
+  if (deliveryFee > 0) {
     deliveryChargeRow.style.display = 'flex';
     deliveryCharge.textContent = '₹40';
   } else {
-    deliveryChargeRow.style.display = 'none';
+    deliveryChargeRow.style.display = 'flex';
+    deliveryCharge.textContent = 'FREE';
   }
   
   const total = subtotal + deliveryFee;
@@ -229,11 +227,10 @@ function closeCheckout() {
 document.getElementById('checkoutForm').addEventListener('submit', async (e) => {
   e.preventDefault();
   
-  const city = document.getElementById('city').value.toLowerCase().trim();
-  const isTuticorin = city.includes('tuticorin') || city.includes('thoothukudi') || city.includes('tuti');
-  const deliveryFee = (!isTuticorin && city.length > 0) ? 40 : 0;
-  
   const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  
+  // Free delivery for orders above ₹1000, otherwise ₹40
+  const deliveryFee = subtotal >= 1000 ? 0 : 40;
   const total = subtotal + deliveryFee;
   
   const orderData = {
@@ -282,7 +279,7 @@ document.getElementById('checkoutForm').addEventListener('submit', async (e) => 
       
       // Show confirmation
       setTimeout(() => {
-        alert(`Order placed! Order ID: ${result.orderId}\n\nYou will be redirected to GPay/PhonePe/Paytm to complete payment of ₹${amount}\n\nIf payment app doesn't open, please pay to:\nUPI: ${upiId}\nAmount: ₹${amount}\nNote: ${note}\n\n📦 Delivery: ${deliveryFee > 0 ? '₹40 (Outside Tuticorin)' : 'FREE (Tuticorin)'}\n🔄 Returns accepted within 7 days`);
+        alert(`Order placed! Order ID: ${result.orderId}\n\nYou will be redirected to GPay/PhonePe/Paytm to complete payment of ₹${amount}\n\nIf payment app doesn't open, please pay to:\nUPI: ${upiId}\nAmount: ₹${amount}\nNote: ${note}\n\n📦 Delivery: ${deliveryFee > 0 ? '₹40' : 'FREE (Order above ₹1000)'}`);
         
         cart = [];
         localStorage.setItem('cart', JSON.stringify(cart));

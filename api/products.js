@@ -1,4 +1,4 @@
-const { createPool } = require('@vercel/postgres');
+const { Pool } = require('pg');
 
 module.exports = async function handler(req, res) {
   // Enable CORS
@@ -10,13 +10,14 @@ module.exports = async function handler(req, res) {
     return res.status(200).end();
   }
 
-  try {
-    const pool = createPool({
-      connectionString: process.env.POSTGRES_URL
-    });
+  const pool = new Pool({
+    connectionString: process.env.POSTGRES_URL,
+    ssl: { rejectUnauthorized: false }
+  });
 
+  try {
     // Create table if not exists
-    await pool.sql`
+    await pool.query(`
       CREATE TABLE IF NOT EXISTS products (
         id TEXT PRIMARY KEY,
         name TEXT NOT NULL,
@@ -27,49 +28,47 @@ module.exports = async function handler(req, res) {
         image TEXT,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
-    `;
+    `);
 
     if (req.method === 'GET') {
-      const { rows } = await pool.sql`SELECT * FROM products ORDER BY created_at DESC`;
-      return res.status(200).json(rows);
+      const result = await pool.query('SELECT * FROM products ORDER BY created_at DESC');
+      return res.status(200).json(result.rows);
     }
 
     if (req.method === 'POST') {
       const { name, category, price, stock, description, image } = req.body;
       const id = Date.now().toString();
       
-      await pool.sql`
-        INSERT INTO products (id, name, category, price, stock, description, image)
-        VALUES (${id}, ${name}, ${category}, ${price}, ${stock}, ${description || ''}, ${image || '/images/placeholder.jpg'})
-      `;
+      const result = await pool.query(
+        'INSERT INTO products (id, name, category, price, stock, description, image) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *',
+        [id, name, category, price, stock, description || '', image || '/images/placeholder.jpg']
+      );
       
-      const { rows } = await pool.sql`SELECT * FROM products WHERE id = ${id}`;
-      return res.status(200).json(rows[0]);
+      return res.status(200).json(result.rows[0]);
     }
 
     if (req.method === 'PUT') {
       const { id } = req.query;
       const { name, category, price, stock, description, image } = req.body;
       
-      await pool.sql`
-        UPDATE products 
-        SET name = ${name}, category = ${category}, price = ${price}, 
-            stock = ${stock}, description = ${description || ''}, image = ${image}
-        WHERE id = ${id}
-      `;
+      const result = await pool.query(
+        'UPDATE products SET name = $1, category = $2, price = $3, stock = $4, description = $5, image = $6 WHERE id = $7 RETURNING *',
+        [name, category, price, stock, description || '', image, id]
+      );
       
-      const { rows } = await pool.sql`SELECT * FROM products WHERE id = ${id}`;
-      return res.status(200).json(rows[0]);
+      return res.status(200).json(result.rows[0]);
     }
 
     if (req.method === 'DELETE') {
       const { id } = req.query;
-      await pool.sql`DELETE FROM products WHERE id = ${id}`;
+      await pool.query('DELETE FROM products WHERE id = $1', [id]);
       return res.status(200).json({ success: true });
     }
 
   } catch (error) {
     console.error('Database error:', error);
-    return res.status(500).json({ error: error.message, details: error.toString() });
+    return res.status(500).json({ error: error.message });
+  } finally {
+    await pool.end();
   }
 };

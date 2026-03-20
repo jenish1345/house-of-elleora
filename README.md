@@ -14,8 +14,8 @@ Browse our beautiful collection of:
 
 ## 📦 Shipping & Delivery
 
-- **FREE Delivery** within Tuticorin
-- **₹40 Delivery Charges** for orders outside Tuticorin
+- **₹40 Delivery Charges** for all orders
+- **FREE Delivery** on orders above ₹1000
 - Fast and secure delivery to your doorstep
 
 ## 💳 Payment
@@ -23,12 +23,6 @@ Browse our beautiful collection of:
 - Secure UPI payment (Google Pay, PhonePe, Paytm)
 - **No Cash on Delivery (COD)**
 - 100% safe and encrypted transactions
-
-## 🔄 Returns & Exchange
-
-- **7-day return policy** from date of delivery
-- Products must be in original condition
-- Contact us for return requests
 
 ## 📞 Contact Us
 
