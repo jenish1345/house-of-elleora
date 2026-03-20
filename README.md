@@ -2,7 +2,7 @@
 
 **"Her Aura, Her Charm"**
 
-Welcome to House of Elleora - Your destination for elegant women's and kids' accessories!
+Welcome to House of Elleora - Your destination for elegant women's accessories!
 
 ## 🛍️ Shop Our Collection
 
@@ -11,9 +11,6 @@ Browse our beautiful collection of:
 - 👑 Hairbands  
 - 💫 Earrings
 - ✨ Bracelets
-- 💍 Chains
-- 🎀 Kids Accessories
-- 🌟 And More!
 
 ## 📦 Shipping & Delivery
 
