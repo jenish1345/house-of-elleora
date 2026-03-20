@@ -318,12 +318,6 @@ function showPaymentModal(orderId, amount, upiId, deliveryFee) {
           Pay with Paytm
         </button>
         
-        <div class="qr-code-section">
-          <p><strong>Or scan QR code:</strong></p>
-          <img src="/images/payment-qr.jpg" alt="Payment QR Code" class="payment-qr" />
-          <p class="qr-name">ANTONY JEYAKUMAR</p>
-        </div>
-        
         <div class="manual-payment">
           <p><strong>Or pay manually:</strong></p>
           <div class="upi-details">
