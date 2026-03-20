@@ -265,33 +265,137 @@ document.getElementById('checkoutForm').addEventListener('submit', async (e) => 
     if (response.ok) {
       const result = await response.json();
       
-      // Open GPay payment
+      // Payment details
       const upiId = 'antonyjenish1345@okhdfcbank';
       const name = 'House of Elleora';
       const amount = total.toFixed(2);
       const note = `Order ${result.orderId}`;
       
-      // UPI payment URL
-      const upiUrl = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(name)}&am=${amount}&cu=INR&tn=${encodeURIComponent(note)}`;
+      // Create payment modal
+      showPaymentModal(result.orderId, amount, upiId, deliveryFee);
       
-      // Try to open UPI app
-      window.location.href = upiUrl;
-      
-      // Show confirmation
-      setTimeout(() => {
-        alert(`Order placed! Order ID: ${result.orderId}\n\nYou will be redirected to GPay/PhonePe/Paytm to complete payment of ₹${amount}\n\nIf payment app doesn't open, please pay to:\nUPI: ${upiId}\nAmount: ₹${amount}\nNote: ${note}\n\n📦 Delivery: ${deliveryFee > 0 ? '₹40' : 'FREE (Order above ₹1000)'}`);
-        
-        cart = [];
-        localStorage.setItem('cart', JSON.stringify(cart));
-        updateCartUI();
-        closeCheckout();
-        document.getElementById('checkoutForm').reset();
-      }, 1000);
+      // Clear cart
+      cart = [];
+      localStorage.setItem('cart', JSON.stringify(cart));
+      updateCartUI();
+      closeCheckout();
+      document.getElementById('checkoutForm').reset();
     }
   } catch (error) {
     alert('Error placing order. Please try again or contact us directly.');
   }
 });
+
+// Show payment modal
+function showPaymentModal(orderId, amount, upiId, deliveryFee) {
+  const modal = document.createElement('div');
+  modal.className = 'payment-modal';
+  modal.innerHTML = `
+    <div class="payment-modal-content">
+      <h2>✅ Order Placed Successfully!</h2>
+      <p class="order-id">Order ID: <strong>${orderId}</strong></p>
+      
+      <div class="payment-amount">
+        <h3>Amount to Pay: ₹${amount}</h3>
+        <p class="delivery-note">${deliveryFee > 0 ? 'Includes ₹40 delivery charges' : 'Free delivery (Order above ₹1000)'}</p>
+      </div>
+      
+      <div class="payment-methods-section">
+        <h3>Choose Payment Method:</h3>
+        
+        <button class="payment-option-btn gpay-btn" onclick="openGPay('${upiId}', '${amount}', '${orderId}')">
+          <span class="payment-icon">G</span>
+          Pay with Google Pay
+        </button>
+        
+        <button class="payment-option-btn phonepe-btn" onclick="openPhonePe('${upiId}', '${amount}', '${orderId}')">
+          <span class="payment-icon">📱</span>
+          Pay with PhonePe
+        </button>
+        
+        <button class="payment-option-btn paytm-btn" onclick="openPaytm('${upiId}', '${amount}', '${orderId}')">
+          <span class="payment-icon">💳</span>
+          Pay with Paytm
+        </button>
+        
+        <div class="manual-payment">
+          <p><strong>Or pay manually:</strong></p>
+          <div class="upi-details">
+            <p>UPI ID: <strong>${upiId}</strong></p>
+            <button onclick="copyUPI('${upiId}')" class="copy-btn">Copy UPI ID</button>
+          </div>
+          <p>Amount: <strong>₹${amount}</strong></p>
+          <p>Note: <strong>${orderId}</strong></p>
+        </div>
+        
+        <div class="whatsapp-confirm">
+          <p>After payment, send screenshot to:</p>
+          <a href="https://wa.me/919488639502?text=Payment%20done%20for%20Order%20${orderId}%20-%20₹${amount}" 
+             target="_blank" class="whatsapp-btn">
+            💬 Confirm on WhatsApp
+          </a>
+        </div>
+      </div>
+      
+      <button onclick="closePaymentModal()" class="close-payment-btn">Close</button>
+    </div>
+  `;
+  
+  document.body.appendChild(modal);
+  setTimeout(() => modal.classList.add('active'), 10);
+}
+
+// Open GPay
+function openGPay(upiId, amount, orderId) {
+  const upiUrl = `gpay://upi/pay?pa=${upiId}&pn=House%20of%20Elleora&am=${amount}&cu=INR&tn=Order%20${orderId}`;
+  window.location.href = upiUrl;
+  
+  // Fallback to generic UPI
+  setTimeout(() => {
+    const genericUPI = `upi://pay?pa=${upiId}&pn=House%20of%20Elleora&am=${amount}&cu=INR&tn=Order%20${orderId}`;
+    window.location.href = genericUPI;
+  }, 1000);
+}
+
+// Open PhonePe
+function openPhonePe(upiId, amount, orderId) {
+  const upiUrl = `phonepe://pay?pa=${upiId}&pn=House%20of%20Elleora&am=${amount}&cu=INR&tn=Order%20${orderId}`;
+  window.location.href = upiUrl;
+  
+  // Fallback to generic UPI
+  setTimeout(() => {
+    const genericUPI = `upi://pay?pa=${upiId}&pn=House%20of%20Elleora&am=${amount}&cu=INR&tn=Order%20${orderId}`;
+    window.location.href = genericUPI;
+  }, 1000);
+}
+
+// Open Paytm
+function openPaytm(upiId, amount, orderId) {
+  const upiUrl = `paytmmp://pay?pa=${upiId}&pn=House%20of%20Elleora&am=${amount}&cu=INR&tn=Order%20${orderId}`;
+  window.location.href = upiUrl;
+  
+  // Fallback to generic UPI
+  setTimeout(() => {
+    const genericUPI = `upi://pay?pa=${upiId}&pn=House%20of%20Elleora&am=${amount}&cu=INR&tn=Order%20${orderId}`;
+    window.location.href = genericUPI;
+  }, 1000);
+}
+
+// Copy UPI ID
+function copyUPI(upiId) {
+  navigator.clipboard.writeText(upiId).then(() => {
+    alert('UPI ID copied! Open any UPI app and paste it.');
+  });
+}
+
+// Close payment modal
+function closePaymentModal() {
+  const modal = document.querySelector('.payment-modal');
+  if (modal) {
+    modal.classList.remove('active');
+    setTimeout(() => modal.remove(), 300);
+  }
+}
 
 // Filter buttons
 document.querySelectorAll('.filter-btn').forEach(btn => {
