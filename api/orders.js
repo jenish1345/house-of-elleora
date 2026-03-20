@@ -1,4 +1,4 @@
-const { createPool } = require('@vercel/postgres');
+const { Pool } = require('pg');
 
 module.exports = async function handler(req, res) {
   // Enable CORS
@@ -10,13 +10,14 @@ module.exports = async function handler(req, res) {
     return res.status(200).end();
   }
 
-  try {
-    const pool = createPool({
-      connectionString: process.env.POSTGRES_URL
-    });
+  const pool = new Pool({
+    connectionString: process.env.POSTGRES_URL,
+    ssl: { rejectUnauthorized: false }
+  });
 
+  try {
     // Create table if not exists
-    await pool.sql`
+    await pool.query(`
       CREATE TABLE IF NOT EXISTS orders (
         order_id TEXT PRIMARY KEY,
         customer_name TEXT NOT NULL,
@@ -35,13 +36,13 @@ module.exports = async function handler(req, res) {
         status TEXT DEFAULT 'pending',
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
-    `;
+    `);
 
     if (req.method === 'GET') {
-      const { rows } = await pool.sql`SELECT * FROM orders ORDER BY created_at DESC`;
+      const result = await pool.query('SELECT * FROM orders ORDER BY created_at DESC');
       
       // Format orders to match frontend structure
-      const formattedOrders = rows.map(row => ({
+      const formattedOrders = result.rows.map(row => ({
         orderId: row.order_id,
         customer: {
           name: row.customer_name,
@@ -71,18 +72,19 @@ module.exports = async function handler(req, res) {
       const { customer, address, items, subtotal, deliveryCharges, total } = req.body;
       const orderId = 'ORD' + Date.now();
       
-      await pool.sql`
-        INSERT INTO orders (
+      await pool.query(
+        `INSERT INTO orders (
           order_id, customer_name, customer_phone, customer_email,
           address_line1, address_line2, city, state, pincode, landmark,
           items, subtotal, delivery_charges, total, status
-        ) VALUES (
-          ${orderId}, ${customer.name}, ${customer.phone}, ${customer.email || null},
-          ${address.line1}, ${address.line2 || null}, ${address.city}, ${address.state}, 
-          ${address.pincode}, ${address.landmark || null},
-          ${JSON.stringify(items)}, ${subtotal || total}, ${deliveryCharges || 0}, ${total}, 'pending'
-        )
-      `;
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)`,
+        [
+          orderId, customer.name, customer.phone, customer.email || null,
+          address.line1, address.line2 || null, address.city, address.state,
+          address.pincode, address.landmark || null,
+          JSON.stringify(items), subtotal || total, deliveryCharges || 0, total, 'pending'
+        ]
+      );
       
       return res.status(200).json({ success: true, orderId });
     }
@@ -91,14 +93,16 @@ module.exports = async function handler(req, res) {
       const { orderId } = req.query;
       const { status } = req.body;
       
-      await pool.sql`UPDATE orders SET status = ${status} WHERE order_id = ${orderId}`;
+      await pool.query('UPDATE orders SET status = $1 WHERE order_id = $2', [status, orderId]);
       
-      const { rows } = await pool.sql`SELECT * FROM orders WHERE order_id = ${orderId}`;
-      return res.status(200).json(rows[0]);
+      const result = await pool.query('SELECT * FROM orders WHERE order_id = $1', [orderId]);
+      return res.status(200).json(result.rows[0]);
     }
 
   } catch (error) {
     console.error('Database error:', error);
     return res.status(500).json({ error: error.message });
+  } finally {
+    await pool.end();
   }
 };
