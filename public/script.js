@@ -39,8 +39,8 @@ function displayProducts() {
             ${product.stock === 0 ? 'Out of Stock' : product.stock < 5 ? `Only ${product.stock} left!` : `${product.stock} in stock`}
           </span>
         </div>
-        <button class="add-to-cart-btn" onclick="addToCart('${product.id}')" ${product.stock === 0 ? 'disabled' : ''}>
-          ${product.stock === 0 ? 'Out of Stock' : 'Add to Cart'}
+        <button class="add-to-cart-btn" onclick="contactWhatsApp('${product.id}', '${product.name}', ${product.price})">
+          ${product.stock === 0 ? 'Out of Stock' : 'Order on WhatsApp'}
         </button>
       </div>
     </div>
