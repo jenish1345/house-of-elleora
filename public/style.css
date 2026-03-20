@@ -1115,7 +1115,7 @@ input:focus, select:focus, textarea:focus {
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(30px);
   }
   to {
     opacity: 1;
@@ -1126,7 +1126,7 @@ input:focus, select:focus, textarea:focus {
 @keyframes slideUp {
   from {
     opacity: 0;
-    transform: translateY(40px);
+    transform: translateY(50px);
   }
   to {
     opacity: 1;
@@ -1148,7 +1148,7 @@ input:focus, select:focus, textarea:focus {
     transform: translateY(0px);
   }
   50% {
-    transform: translateY(-10px);
+    transform: translateY(-15px);
   }
 }
 
@@ -1161,58 +1161,165 @@ input:focus, select:focus, textarea:focus {
   }
 }
 
+@keyframes glow {
+  0%, 100% {
+    box-shadow: 0 5px 20px var(--shadow);
+  }
+  50% {
+    box-shadow: 0 5px 30px var(--shadow-lg), 0 0 20px rgba(217, 115, 152, 0.4);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-10px);
+  }
+  60% {
+    transform: translateY(-5px);
+  }
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes heartbeat {
+  0%, 100% {
+    transform: scale(1);
+  }
+  10%, 30% {
+    transform: scale(1.1);
+  }
+  20%, 40% {
+    transform: scale(1);
+  }
+}
+
 .fade-in {
-  animation: fadeIn 1s ease-out;
+  animation: fadeIn 1.2s ease-out;
 }
 
 .fade-in-delay {
-  animation: fadeIn 1s ease-out 0.3s both;
+  animation: fadeIn 1.2s ease-out 0.3s both;
 }
 
 .fade-in-delay-2 {
-  animation: fadeIn 1s ease-out 0.6s both;
+  animation: fadeIn 1.2s ease-out 0.6s both;
 }
 
 .slide-up {
-  animation: slideUp 0.8s ease-out;
+  animation: slideUp 1s ease-out;
 }
 
 .pulse {
   animation: pulse 2s ease-in-out infinite;
 }
 
+/* Hero Section Animations */
+.hero-title {
+  background: linear-gradient(45deg, #d97398, #764ba2, #d97398);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: shimmer 4s linear infinite, fadeIn 1s ease-out;
+}
+
 .hero-quote {
   font-family: 'Playfair Display', serif;
   font-style: italic;
-  font-size: 1.2em;
+  font-size: 1.3em;
   color: var(--primary);
   margin-bottom: 20px;
   font-weight: 500;
+  animation: fadeIn 1.2s ease-out 0.3s both;
+  text-shadow: 0 2px 10px rgba(217, 115, 152, 0.2);
 }
 
-.product-card {
-  animation: fadeIn 0.6s ease-out;
+.hero-subtitle {
+  animation: fadeIn 1.2s ease-out 0.5s both;
+}
+
+.hero-contact {
+  animation: fadeIn 1.2s ease-out 0.7s both;
+}
+
+.cta-btn {
+  animation: fadeIn 1.2s ease-out 0.9s both, pulse 2s ease-in-out 2s infinite;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+.cta-btn:hover {
+  animation: heartbeat 0.6s ease-in-out;
+}
+
+/* Product Card Animations */
+.product-card {
+  animation: fadeIn 0.8s ease-out;
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform;
+}
+
 .product-card:hover {
-  transform: translateY(-15px) scale(1.02);
-  box-shadow: 0 20px 50px rgba(217, 115, 152, 0.3);
+  transform: translateY(-20px) scale(1.03);
+  box-shadow: 0 25px 60px rgba(217, 115, 152, 0.35);
+  animation: glow 2s ease-in-out infinite;
 }
 
 .product-card:hover .product-image {
-  transform: scale(1.05);
+  transform: scale(1.08);
 }
 
 .product-image {
-  transition: transform 0.4s ease;
+  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+/* Filter Button Animations */
 .filter-btn {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   overflow: hidden;
+  animation: slideUp 0.6s ease-out;
 }
+
+.filter-btn:nth-child(1) { animation-delay: 0s; }
+.filter-btn:nth-child(2) { animation-delay: 0.1s; }
+.filter-btn:nth-child(3) { animation-delay: 0.2s; }
+.filter-btn:nth-child(4) { animation-delay: 0.3s; }
+.filter-btn:nth-child(5) { animation-delay: 0.4s; }
+.filter-btn:nth-child(6) { animation-delay: 0.5s; }
+.filter-btn:nth-child(7) { animation-delay: 0.6s; }
+.filter-btn:nth-child(8) { animation-delay: 0.7s; }
 
 .filter-btn::before {
   content: '';
@@ -1222,20 +1329,29 @@ input:focus, select:focus, textarea:focus {
   width: 0;
   height: 0;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.4);
   transform: translate(-50%, -50%);
-  transition: width 0.6s, height 0.6s;
+  transition: width 0.6s ease, height 0.6s ease;
 }
 
 .filter-btn:hover::before {
-  width: 300px;
-  height: 300px;
+  width: 400px;
+  height: 400px;
 }
 
+.filter-btn:hover {
+  transform: translateY(-5px) scale(1.05);
+}
+
+.filter-icon {
+  animation: bounce 2s ease-in-out infinite;
+}
+
+/* Add to Cart Button Animations */
 .add-to-cart-btn {
   position: relative;
   overflow: hidden;
-  transition: all 0.3s ease;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .add-to-cart-btn::after {
@@ -1248,26 +1364,37 @@ input:focus, select:focus, textarea:focus {
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.5);
   transform: translate(-50%, -50%);
-  transition: width 0.6s, height 0.6s;
+  transition: width 0.6s ease, height 0.6s ease;
 }
 
 .add-to-cart-btn:hover::after {
-  width: 300px;
-  height: 300px;
+  width: 400px;
+  height: 400px;
 }
 
+.add-to-cart-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 25px rgba(217, 115, 152, 0.4);
+}
+
+/* WhatsApp Float Animation */
 .whatsapp-float {
   animation: float 3s ease-in-out infinite;
 }
 
+.whatsapp-float:hover {
+  animation: heartbeat 0.6s ease-in-out;
+}
+
+/* Hero Decoration Animations */
 .hero-decoration::before {
   content: '✨';
   position: absolute;
   font-size: 3em;
   top: 20%;
   right: 10%;
-  animation: float 4s ease-in-out infinite;
-  opacity: 0.3;
+  animation: float 4s ease-in-out infinite, rotate 20s linear infinite;
+  opacity: 0.4;
 }
 
 .hero-decoration::after {
@@ -1276,35 +1403,75 @@ input:focus, select:focus, textarea:focus {
   font-size: 2.5em;
   bottom: 30%;
   left: 15%;
-  animation: float 5s ease-in-out infinite 1s;
-  opacity: 0.3;
+  animation: float 5s ease-in-out infinite 1s, rotate 15s linear infinite reverse;
+  opacity: 0.4;
 }
 
 /* Sparkle effect on hover */
 .product-card::before {
   content: '✨';
   position: absolute;
-  top: 10px;
-  right: 10px;
-  font-size: 1.5em;
+  top: 15px;
+  right: 15px;
+  font-size: 1.8em;
   opacity: 0;
-  transition: opacity 0.3s;
+  transition: opacity 0.4s ease;
+  z-index: 10;
 }
 
 .product-card:hover::before {
   opacity: 1;
-  animation: float 2s ease-in-out infinite;
+  animation: float 2s ease-in-out infinite, rotate 3s linear infinite;
 }
 
-/* Gradient text animation */
-.hero-title {
-  background: linear-gradient(45deg, #d97398, #764ba2, #d97398);
-  background-size: 200% auto;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  animation: shimmer 3s linear infinite;
+/* Navbar Animation */
+.navbar {
+  animation: slideUp 0.8s ease-out;
 }
+
+.logo-text h1 {
+  animation: slideInLeft 0.8s ease-out;
+}
+
+.tagline {
+  animation: slideInLeft 0.8s ease-out 0.2s both;
+}
+
+.whatsapp-order-btn {
+  animation: slideInRight 0.8s ease-out;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.whatsapp-order-btn:hover {
+  animation: pulse 0.6s ease-in-out;
+}
+
+/* Section Title Animation */
+.section-title {
+  animation: fadeIn 1s ease-out;
+  position: relative;
+}
+
+.section-title::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100px;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, var(--primary), transparent);
+  animation: shimmer 2s linear infinite;
+}
+
+/* Footer Animation */
+.footer-section {
+  animation: fadeIn 1s ease-out;
+}
+
+.footer-section:nth-child(1) { animation-delay: 0.1s; }
+.footer-section:nth-child(2) { animation-delay: 0.2s; }
+.footer-section:nth-child(3) { animation-delay: 0.3s; }
 
 /* Smooth scroll */
 html {
@@ -1321,4 +1488,24 @@ html {
 .product-image[src] {
   animation: none;
   background: none;
+}
+
+/* Price Animation */
+.product-price {
+  transition: all 0.3s ease;
+}
+
+.product-card:hover .product-price {
+  transform: scale(1.1);
+  color: var(--primary-dark);
+}
+
+/* Category Badge Animation */
+.product-category {
+  transition: all 0.3s ease;
+}
+
+.product-card:hover .product-category {
+  transform: translateX(5px);
+  letter-spacing: 3px;
 }
