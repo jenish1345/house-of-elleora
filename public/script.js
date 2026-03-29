@@ -24,15 +24,7 @@ function displayProducts() {
     return;
   }
 
-  container.innerHTML = filtered.map(product => {
-    const productData = encodeURIComponent(JSON.stringify({
-      name: product.name,
-      price: product.price,
-      image: product.image,
-      category: product.category
-    }));
-    
-    return `
+  container.innerHTML = filtered.map((product, index) => `
     <div class="product-card">
       <img src="${product.image}" alt="${product.name}" class="product-image" onerror="this.src='/images/placeholder.jpg'">
       <div class="product-info">
@@ -45,25 +37,31 @@ function displayProducts() {
             ${product.stock === 0 ? 'Out of Stock' : product.stock < 5 ? `Only ${product.stock} left!` : `${product.stock} in stock`}
           </span>
         </div>
-        <button class="add-to-cart-btn" onclick='contactWhatsApp(${productData})' ${product.stock === 0 ? 'disabled' : ''}>
+        <button class="add-to-cart-btn" 
+                data-product-name="${product.name.replace(/"/g, '&quot;')}" 
+                data-product-price="${product.price}" 
+                data-product-image="${product.image.replace(/"/g, '&quot;')}"
+                onclick="contactWhatsApp(this)" 
+                ${product.stock === 0 ? 'disabled' : ''}>
           ${product.stock === 0 ? 'Out of Stock' : '💬 Order on WhatsApp'}
         </button>
       </div>
     </div>
-  `;
-  }).join('');
+  `).join('');
 }
 
 // Contact via WhatsApp for specific product
-function contactWhatsApp(productData) {
-  const product = JSON.parse(decodeURIComponent(productData));
+function contactWhatsApp(button) {
+  const productName = button.getAttribute('data-product-name');
+  const productPrice = button.getAttribute('data-product-price');
+  const productImage = button.getAttribute('data-product-image');
   
   // Get full image URL
-  const imageUrl = product.image.startsWith('http') 
-    ? product.image 
-    : `${window.location.origin}${product.image}`;
+  const imageUrl = productImage.startsWith('http') 
+    ? productImage 
+    : `${window.location.origin}${productImage}`;
   
-  const message = `Hi! I'm interested in:\n\n*${product.name}*\nPrice: ₹${product.price}\n\n📸 Product Image:\n${imageUrl}\n\nCan you provide more details?`;
+  const message = `Hi! I'm interested in:\n\n*${productName}*\nPrice: ₹${productPrice}\n\n📸 Product Image:\n${imageUrl}\n\nCan you provide more details?`;
   
   const whatsappUrl = `https://wa.me/919488639502?text=${encodeURIComponent(message)}`;
   window.open(whatsappUrl, '_blank');
