@@ -24,7 +24,15 @@ function displayProducts() {
     return;
   }
 
-  container.innerHTML = filtered.map(product => `
+  container.innerHTML = filtered.map(product => {
+    const productData = encodeURIComponent(JSON.stringify({
+      name: product.name,
+      price: product.price,
+      image: product.image,
+      category: product.category
+    }));
+    
+    return `
     <div class="product-card">
       <img src="${product.image}" alt="${product.name}" class="product-image" onerror="this.src='/images/placeholder.jpg'">
       <div class="product-info">
@@ -37,17 +45,26 @@ function displayProducts() {
             ${product.stock === 0 ? 'Out of Stock' : product.stock < 5 ? `Only ${product.stock} left!` : `${product.stock} in stock`}
           </span>
         </div>
-        <button class="add-to-cart-btn" onclick="contactWhatsApp('${product.name}', ${product.price})" ${product.stock === 0 ? 'disabled' : ''}>
+        <button class="add-to-cart-btn" onclick='contactWhatsApp(${productData})' ${product.stock === 0 ? 'disabled' : ''}>
           ${product.stock === 0 ? 'Out of Stock' : '💬 Order on WhatsApp'}
         </button>
       </div>
     </div>
-  `).join('');
+  `;
+  }).join('');
 }
 
 // Contact via WhatsApp for specific product
-function contactWhatsApp(productName, price) {
-  const message = `Hi! I'm interested in:\n\n*${productName}*\nPrice: ₹${price}\n\nCan you provide more details?`;
+function contactWhatsApp(productData) {
+  const product = JSON.parse(decodeURIComponent(productData));
+  
+  // Get full image URL
+  const imageUrl = product.image.startsWith('http') 
+    ? product.image 
+    : `${window.location.origin}${product.image}`;
+  
+  const message = `Hi! I'm interested in:\n\n*${product.name}*\nPrice: ₹${product.price}\n\n📸 Product Image:\n${imageUrl}\n\nCan you provide more details?`;
+  
   const whatsappUrl = `https://wa.me/919488639502?text=${encodeURIComponent(message)}`;
   window.open(whatsappUrl, '_blank');
 }
