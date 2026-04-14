@@ -4,7 +4,8 @@ let currentFilter = 'all';
 // Load products
 async function loadProducts() {
   try {
-    const response = await fetch('/api/products');
+    // Use Vercel API which can handle large payloads
+    const response = await fetch('https://houseofelleora.vercel.app/api/products');
     allProducts = await response.json();
     displayProducts();
   } catch (error) {

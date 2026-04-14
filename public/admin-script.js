@@ -4,7 +4,7 @@ let editingId = null;
 // Load products
 async function loadProducts() {
   try {
-    const response = await fetch('/api/products');
+    const response = await fetch('https://houseofelleora.vercel.app/api/products');
     products = await response.json();
     displayProducts();
   } catch (error) {
@@ -63,7 +63,7 @@ document.getElementById('productForm').addEventListener('submit', async (e) => {
   }
 
   try {
-    const url = editingId ? `/api/products?id=${editingId}` : '/api/products';
+    const url = editingId ? `https://houseofelleora.vercel.app/api/products?id=${editingId}` : 'https://houseofelleora.vercel.app/api/products';
     const method = editingId ? 'PUT' : 'POST';
     
     const response = await fetch(url, {
@@ -119,7 +119,7 @@ async function deleteProduct(id) {
   if (!confirm('Are you sure you want to delete this product?')) return;
 
   try {
-    const response = await fetch(`/api/products?id=${id}`, {
+    const response = await fetch(`https://houseofelleora.vercel.app/api/products?id=${id}`, {
       method: 'DELETE'
     });
 
