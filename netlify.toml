@@ -1,7 +1,7 @@
 [build]
   command = "npm install"
   publish = "public"
-  functions = "api"
+  functions = ".netlify/functions"
 
 [[redirects]]
   from = "/api/*"
@@ -10,3 +10,4 @@
 
 [functions]
   node_bundler = "esbuild"
+  external_node_modules = ["pg"]
