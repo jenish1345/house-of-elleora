@@ -34,7 +34,8 @@ exports.handler = async (event, context) => {
     `);
 
     if (event.httpMethod === 'GET') {
-      const result = await pool.query('SELECT * FROM products ORDER BY created_at DESC');
+      const result = await pool.query('SELECT id, name, description, price, category, stock, image, created_at FROM products ORDER BY created_at DESC LIMIT 50');
+      
       return {
         statusCode: 200,
         headers,
