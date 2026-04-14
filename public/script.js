@@ -1,30 +1,11 @@
 let allProducts = [];
 let currentFilter = 'all';
-let currentPage = 1;
-let totalPages = 1;
 
 // Load products
 async function loadProducts() {
   try {
-    // Load all pages to get all products
-    let page = 1;
-    allProducts = [];
-    
-    while (true) {
-      const response = await fetch(`/api/products?page=${page}`);
-      const data = await response.json();
-      
-      if (data.products && data.products.length > 0) {
-        allProducts = allProducts.concat(data.products);
-        page++;
-        
-        // Stop if we've loaded all pages
-        if (page > data.totalPages) break;
-      } else {
-        break;
-      }
-    }
-    
+    const response = await fetch('/api/products');
+    allProducts = await response.json();
     displayProducts();
   } catch (error) {
     console.error('Error loading products:', error);

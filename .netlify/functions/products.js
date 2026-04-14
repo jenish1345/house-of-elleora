@@ -34,29 +34,34 @@ exports.handler = async (event, context) => {
     `);
 
     if (event.httpMethod === 'GET') {
-      // Get page parameter (default to 1)
-      const page = parseInt(event.queryStringParameters?.page || '1');
-      const limit = 20; // Load 20 products at a time
-      const offset = (page - 1) * limit;
+      const id = event.queryStringParameters?.id;
       
-      const result = await pool.query(
-        'SELECT id, name, description, price, category, stock, image, created_at FROM products ORDER BY created_at DESC LIMIT $1 OFFSET $2',
-        [limit, offset]
-      );
+      // If requesting a single product (with image)
+      if (id) {
+        const result = await pool.query('SELECT * FROM products WHERE id = $1', [id]);
+        return {
+          statusCode: 200,
+          headers,
+          body: JSON.stringify(result.rows[0] || null)
+        };
+      }
       
-      // Get total count
-      const countResult = await pool.query('SELECT COUNT(*) FROM products');
-      const total = parseInt(countResult.rows[0].count);
+      // Otherwise return all products WITHOUT images (to avoid payload size)
+      const result = await pool.query(`
+        SELECT id, name, description, price, category, stock, 
+               CASE 
+                 WHEN image LIKE 'http%' THEN image
+                 ELSE '/images/placeholder.jpg'
+               END as image,
+               created_at 
+        FROM products 
+        ORDER BY created_at DESC
+      `);
       
       return {
         statusCode: 200,
         headers,
-        body: JSON.stringify({
-          products: result.rows,
-          page: page,
-          totalPages: Math.ceil(total / limit),
-          total: total
-        })
+        body: JSON.stringify(result.rows)
       };
     }
 
