@@ -31,33 +31,13 @@ exports.handler = async (event, context) => {
         };
       }
       
-      // Return products list with minimal data (no large images)
-      const result = await pool.query(`
-        SELECT 
-          id, 
-          name, 
-          description, 
-          price, 
-          category, 
-          stock,
-          SUBSTRING(image, 1, 100) as image_preview,
-          created_at 
-        FROM products 
-        ORDER BY created_at DESC
-        LIMIT 200
-      `);
-      
-      // Return products with a flag to load images separately
-      const products = result.rows.map(p => ({
-        ...p,
-        image: '/images/placeholder.jpg', // Use placeholder initially
-        hasImage: p.image_preview && p.image_preview.length > 0
-      }));
+      // Return all products with images
+      const result = await pool.query('SELECT * FROM products ORDER BY created_at DESC');
       
       return {
         statusCode: 200,
         headers,
-        body: JSON.stringify(products)
+        body: JSON.stringify(result.rows)
       };
     }
 
