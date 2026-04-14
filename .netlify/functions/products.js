@@ -1,7 +1,6 @@
 const { Pool } = require('pg');
 
 exports.handler = async (event, context) => {
-  // Enable CORS
   const headers = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE',
@@ -19,24 +18,10 @@ exports.handler = async (event, context) => {
   });
 
   try {
-    // Create table if not exists
-    await pool.query(`
-      CREATE TABLE IF NOT EXISTS products (
-        id SERIAL PRIMARY KEY,
-        name TEXT NOT NULL,
-        description TEXT,
-        price DECIMAL(10,2) NOT NULL,
-        category TEXT NOT NULL,
-        stock INTEGER DEFAULT 0,
-        image TEXT,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-      )
-    `);
-
     if (event.httpMethod === 'GET') {
       const id = event.queryStringParameters?.id;
       
-      // If requesting a single product (with image)
+      // If requesting a single product, return it with full image
       if (id) {
         const result = await pool.query('SELECT * FROM products WHERE id = $1', [id]);
         return {
@@ -46,22 +31,33 @@ exports.handler = async (event, context) => {
         };
       }
       
-      // Otherwise return all products WITHOUT images (to avoid payload size)
+      // Return products list with minimal data (no large images)
       const result = await pool.query(`
-        SELECT id, name, description, price, category, stock, 
-               CASE 
-                 WHEN image LIKE 'http%' THEN image
-                 ELSE '/images/placeholder.jpg'
-               END as image,
-               created_at 
+        SELECT 
+          id, 
+          name, 
+          description, 
+          price, 
+          category, 
+          stock,
+          SUBSTRING(image, 1, 100) as image_preview,
+          created_at 
         FROM products 
         ORDER BY created_at DESC
+        LIMIT 200
       `);
+      
+      // Return products with a flag to load images separately
+      const products = result.rows.map(p => ({
+        ...p,
+        image: '/images/placeholder.jpg', // Use placeholder initially
+        hasImage: p.image_preview && p.image_preview.length > 0
+      }));
       
       return {
         statusCode: 200,
         headers,
-        body: JSON.stringify(result.rows)
+        body: JSON.stringify(products)
       };
     }
 

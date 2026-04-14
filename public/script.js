@@ -4,12 +4,12 @@ let currentFilter = 'all';
 // Load products
 async function loadProducts() {
   try {
-    // Use Vercel API which can handle large payloads
-    const response = await fetch('https://houseofelleora.vercel.app/api/products');
+    const response = await fetch('/api/products');
     allProducts = await response.json();
     displayProducts();
   } catch (error) {
     console.error('Error loading products:', error);
+    document.getElementById('products').innerHTML = '<p style="text-align: center; color: red;">Error loading products. Please refresh the page.</p>';
   }
 }
 
