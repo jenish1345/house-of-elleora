@@ -34,12 +34,29 @@ exports.handler = async (event, context) => {
     `);
 
     if (event.httpMethod === 'GET') {
-      const result = await pool.query('SELECT id, name, description, price, category, stock, image, created_at FROM products ORDER BY created_at DESC LIMIT 50');
+      // Get page parameter (default to 1)
+      const page = parseInt(event.queryStringParameters?.page || '1');
+      const limit = 20; // Load 20 products at a time
+      const offset = (page - 1) * limit;
+      
+      const result = await pool.query(
+        'SELECT id, name, description, price, category, stock, image, created_at FROM products ORDER BY created_at DESC LIMIT $1 OFFSET $2',
+        [limit, offset]
+      );
+      
+      // Get total count
+      const countResult = await pool.query('SELECT COUNT(*) FROM products');
+      const total = parseInt(countResult.rows[0].count);
       
       return {
         statusCode: 200,
         headers,
-        body: JSON.stringify(result.rows)
+        body: JSON.stringify({
+          products: result.rows,
+          page: page,
+          totalPages: Math.ceil(total / limit),
+          total: total
+        })
       };
     }
 
