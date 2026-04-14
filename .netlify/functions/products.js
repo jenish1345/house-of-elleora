@@ -21,7 +21,7 @@ exports.handler = async (event, context) => {
     if (event.httpMethod === 'GET') {
       const id = event.queryStringParameters?.id;
       
-      // If requesting a single product, return it with full image
+      // If requesting a single product, return it
       if (id) {
         const result = await pool.query('SELECT * FROM products WHERE id = $1', [id]);
         return {
@@ -31,8 +31,8 @@ exports.handler = async (event, context) => {
         };
       }
       
-      // Return all products with images
-      const result = await pool.query('SELECT * FROM products ORDER BY created_at DESC');
+      // Return all products - Cloudinary URLs are small so this should work
+      const result = await pool.query('SELECT id, name, description, price, category, stock, image, created_at FROM products ORDER BY created_at DESC');
       
       return {
         statusCode: 200,
