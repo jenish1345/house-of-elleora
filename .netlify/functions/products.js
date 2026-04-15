@@ -31,8 +31,17 @@ exports.handler = async (event, context) => {
         };
       }
       
-      // Return all products - Cloudinary URLs are small so this should work
-      const result = await pool.query('SELECT id, name, description, price, category, stock, image, created_at FROM products ORDER BY created_at DESC');
+      // Return only products with Cloudinary URLs (not base64)
+      const result = await pool.query(`
+        SELECT id, name, description, price, category, stock, 
+               CASE 
+                 WHEN image LIKE 'https://res.cloudinary.com%' THEN image
+                 ELSE '/images/placeholder.jpg'
+               END as image,
+               created_at 
+        FROM products 
+        ORDER BY created_at DESC
+      `);
       
       return {
         statusCode: 200,
