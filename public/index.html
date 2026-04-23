@@ -6,6 +6,7 @@
   <meta name="description" content="House of Elleora - Elegant accessories for modern women and kids">
   <title>House of Elleora - Exquisite Women's Accessories</title>
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="enhanced-style.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -45,10 +46,34 @@
     <div class="hero-decoration"></div>
   </section>
 
+  <!-- Search Bar -->
+  <section class="container" style="padding-top: 40px;">
+    <div class="search-container">
+      <input type="text" 
+             id="searchInput" 
+             class="search-input" 
+             placeholder="Search for products..."
+             autocomplete="off">
+      <span class="search-icon">🔍</span>
+    </div>
+  </section>
+
   <!-- Filters -->
   <section class="filters-section">
     <div class="container">
-      <h3 class="section-title">Browse by Category</h3>
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+        <h3 class="section-title" style="margin-bottom: 0;">Browse by Category</h3>
+        <div class="sort-container">
+          <label for="sortSelect">Sort by:</label>
+          <select id="sortSelect" class="sort-select">
+            <option value="newest">Newest First</option>
+            <option value="price-low">Price: Low to High</option>
+            <option value="price-high">Price: High to Low</option>
+            <option value="name">Name (A-Z)</option>
+          </select>
+        </div>
+      </div>
+      
       <div class="filters">
         <button class="filter-btn active" data-category="all">
           <span class="filter-icon">✨</span>
@@ -91,122 +116,26 @@
     <div id="products" class="products-grid"></div>
   </main>
 
-  <!-- Shopping Cart Sidebar -->
-  <div class="cart-sidebar" id="cartSidebar">
-    <div class="cart-header">
-      <h3>Your Cart</h3>
-      <button class="close-cart" onclick="toggleCart()">×</button>
-    </div>
-    <div class="cart-items" id="cartItems"></div>
-    <div class="cart-footer">
-      <div class="cart-total">
-        <span>Total:</span>
-        <span class="total-amount">₹0</span>
+  <!-- Quick View Modal -->
+  <div id="quickViewModal" class="modal">
+    <div class="quick-view-content">
+      <img id="quickViewImage" src="" alt="" class="quick-view-image">
+      <div class="quick-view-details">
+        <div class="product-category" id="quickViewCategory"></div>
+        <h2 id="quickViewName"></h2>
+        <div class="product-price" id="quickViewPrice"></div>
+        <p class="product-description" id="quickViewDescription"></p>
+        <div class="product-stock" id="quickViewStock"></div>
+        <button id="quickViewOrderBtn">💬 Order on WhatsApp</button>
+        <button onclick="closeQuickView()" style="background: #ccc; margin-top: 10px;">Close</button>
       </div>
-      <button class="checkout-btn" onclick="openCheckout()">Proceed to Checkout</button>
     </div>
   </div>
 
-  <!-- Checkout Modal -->
-  <div class="modal" id="checkoutModal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h3>Checkout</h3>
-        <button class="close-modal" onclick="closeCheckout()">×</button>
-      </div>
-      <form id="checkoutForm">
-        <div class="form-section">
-          <h4>Contact Information</h4>
-          <div class="form-group">
-            <label>Full Name *</label>
-            <input type="text" id="customerName" required>
-          </div>
-          <div class="form-group">
-            <label>Phone Number *</label>
-            <input type="tel" id="customerPhone" required pattern="[0-9]{10}">
-          </div>
-          <div class="form-group">
-            <label>Email</label>
-            <input type="email" id="customerEmail">
-          </div>
-        </div>
+  <div class="overlay" id="overlay" onclick="closeQuickView()"></div>
 
-        <div class="form-section">
-          <h4>Delivery Address</h4>
-          <div class="form-group">
-            <label>Address Line 1 *</label>
-            <input type="text" id="address1" required>
-          </div>
-          <div class="form-group">
-            <label>Address Line 2</label>
-            <input type="text" id="address2">
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label>City *</label>
-              <input type="text" id="city" required>
-            </div>
-            <div class="form-group">
-              <label>State *</label>
-              <input type="text" id="state" required>
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label>PIN Code *</label>
-              <input type="text" id="pincode" required pattern="[0-9]{6}">
-            </div>
-            <div class="form-group">
-              <label>Landmark</label>
-              <input type="text" id="landmark">
-            </div>
-          </div>
-        </div>
-
-        <div class="order-summary">
-          <h4>Order Summary</h4>
-          <div id="orderSummary"></div>
-          <div class="summary-item" id="deliveryChargeRow">
-            <span>Delivery Charges</span>
-            <span id="deliveryCharge">₹40</span>
-          </div>
-          <div class="summary-total">
-            <span>Total Amount:</span>
-            <span class="final-amount">₹0</span>
-          </div>
-          <p class="delivery-info">💝 Free delivery on orders above ₹1000!</p>
-        </div>
-
-        <div class="policies">
-          <div class="policy-item">
-            <span class="policy-icon">❌</span>
-            <span>No Cash on Delivery (COD) - Online payment only</span>
-          </div>
-          <div class="policy-item">
-            <span class="policy-icon">✅</span>
-            <span>100% secure UPI payment</span>
-          </div>
-        </div>
-
-        <div class="payment-methods">
-          <p>Pay securely with UPI</p>
-          <div class="payment-icons">
-            <span class="payment-badge gpay">Google Pay</span>
-            <span class="payment-badge">PhonePe</span>
-            <span class="payment-badge">Paytm</span>
-            <span class="payment-badge">Any UPI App</span>
-          </div>
-          <p class="payment-note">You'll be redirected to your payment app</p>
-        </div>
-        <button type="submit" class="pay-btn">
-          <span class="gpay-icon">G</span>
-          Pay ₹<span id="payAmount">0</span> with UPI
-        </button>
-      </form>
-    </div>
-  </div>
-
-  <div class="overlay" id="overlay"></div>
+  <!-- Back to Top Button -->
+  <button id="backToTop" title="Back to top">↑</button>
 
   <!-- WhatsApp Floating Button -->
   <a href="https://wa.me/919488639502?text=Hi!%20I'm%20interested%20in%20your%20accessories" class="whatsapp-float" target="_blank" aria-label="Chat on WhatsApp">

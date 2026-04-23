@@ -31,15 +31,11 @@ exports.handler = async (event, context) => {
         };
       }
       
-      // Return only products with Cloudinary URLs (not base64)
+      // Return only products with Cloudinary images (exclude base64)
       const result = await pool.query(`
-        SELECT id, name, description, price, category, stock, 
-               CASE 
-                 WHEN image LIKE 'https://res.cloudinary.com%' THEN image
-                 ELSE '/images/placeholder.jpg'
-               END as image,
-               created_at 
+        SELECT id, name, description, price, category, stock, image, created_at 
         FROM products 
+        WHERE image LIKE 'https://res.cloudinary.com%'
         ORDER BY created_at DESC
       `);
       
