@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="House of Elleora - Elegant accessories for modern women and kids">
+  <title>House of Elleora - Exquisite Women's Accessories</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="enhanced-style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="navbar">
+    <div class="container nav-container">
+      <div class="logo">
+        <div class="logo-text">
+          <h1>House of Elleora</h1>
+          <p class="tagline">Her Aura, Her Charm</p>
+        </div>
+      </div>
+      <div class="nav-actions">
+        <a href="https://wa.me/919488639502?text=Hi!%20I'm%20interested%20in%20your%20accessories" class="whatsapp-order-btn">
+          💬 Order on WhatsApp
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-content">
+      <h2 class="hero-title">Discover Your Perfect Accessory</h2>
+      <p class="hero-quote">"Elegance is the only beauty that never fades"</p>
+      <p class="hero-subtitle">Handpicked collection of elegant accessories for modern women and kids</p>
+      <div class="hero-contact">
+        <p>📞 Call/WhatsApp: <a href="tel:+919488639502">+91 9488639502</a></p>
+        <p>📷 Follow us: <a href="https://www.instagram.com/house.of.elleora" target="_blank">@house.of.elleora</a></p>
+      </div>
+      <button class="cta-btn" onclick="document.getElementById('products').scrollIntoView({behavior: 'smooth'})">
+        Shop Collection
+      </button>
+    </div>
+    <div class="hero-decoration"></div>
+  </section>
+
+  <!-- Search Bar -->
+  <section class="container" style="padding-top: 40px;">
+    <div class="search-container">
+      <input type="text" 
+             id="searchInput" 
+             class="search-input" 
+             placeholder="Search for products..."
+             autocomplete="off">
+      <span class="search-icon">🔍</span>
+    </div>
+  </section>
+
+  <!-- Filters -->
+  <section class="filters-section">
+    <div class="container">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+        <h3 class="section-title" style="margin-bottom: 0;">Browse by Category</h3>
+        <div class="sort-container">
+          <label for="sortSelect">Sort by:</label>
+          <select id="sortSelect" class="sort-select">
+            <option value="newest">Newest First</option>
+            <option value="price-low">Price: Low to High</option>
+            <option value="price-high">Price: High to Low</option>
+            <option value="name">Name (A-Z)</option>
+          </select>
+        </div>
+      </div>
+      
+      <div class="filters">
+        <button class="filter-btn active" data-category="all">
+          <span class="filter-icon">✨</span>
+          All Items
+        </button>
+        <button class="filter-btn" data-category="Hair Clips">
+          <span class="filter-icon">💎</span>
+          Hair Clips
+        </button>
+        <button class="filter-btn" data-category="Hairbands">
+          <span class="filter-icon">👑</span>
+          Hairbands
+        </button>
+        <button class="filter-btn" data-category="Earrings">
+          <span class="filter-icon">💫</span>
+          Earrings
+        </button>
+        <button class="filter-btn" data-category="Bracelets">
+          <span class="filter-icon">✨</span>
+          Bracelets
+        </button>
+        <button class="filter-btn" data-category="Chains">
+          <span class="filter-icon">💍</span>
+          Chains
+        </button>
+        <button class="filter-btn" data-category="Kids Accessories">
+          <span class="filter-icon">🎀</span>
+          Kids Accessories
+        </button>
+        <button class="filter-btn" data-category="Others">
+          <span class="filter-icon">🌟</span>
+          Others
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Products -->
+  <main class="container">
+    <div id="products" class="products-grid"></div>
+  </main>
+
+  <!-- Quick View Modal -->
+  <div id="quickViewModal" class="modal">
+    <div class="quick-view-content">
+      <img id="quickViewImage" src="" alt="" class="quick-view-image">
+      <div class="quick-view-details">
+        <div class="product-category" id="quickViewCategory"></div>
+        <h2 id="quickViewName"></h2>
+        <div class="product-price" id="quickViewPrice"></div>
+        <p class="product-description" id="quickViewDescription"></p>
+        <div class="product-stock" id="quickViewStock"></div>
+        <button id="quickViewOrderBtn">💬 Order on WhatsApp</button>
+        <button onclick="closeQuickView()" style="background: #ccc; margin-top: 10px;">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="overlay" id="overlay" onclick="closeQuickView()"></div>
+
+  <!-- Back to Top Button -->
+  <button id="backToTop" title="Back to top">↑</button>
+
+  <!-- WhatsApp Floating Button -->
+  <a href="https://wa.me/919488639502?text=Hi!%20I'm%20interested%20in%20your%20accessories" class="whatsapp-float" target="_blank" aria-label="Chat on WhatsApp">
+    <svg viewBox="0 0 32 32" width="32" height="32">
+      <path fill="white" d="M16 0c-8.837 0-16 7.163-16 16 0 2.825 0.737 5.607 2.137 8.048l-2.137 7.952 7.933-2.127c2.42 1.37 5.173 2.127 8.067 2.127 8.837 0 16-7.163 16-16s-7.163-16-16-16zM16 29.467c-2.482 0-4.908-0.646-7.07-1.87l-0.507-0.292-4.713 1.262 1.262-4.669-0.292-0.508c-1.207-2.100-1.847-4.507-1.847-6.924 0-7.435 6.050-13.485 13.485-13.485s13.485 6.050 13.485 13.485c0 7.435-6.050 13.485-13.485 13.485zM21.960 18.735c-0.353-0.177-2.085-1.030-2.408-1.147-0.323-0.117-0.558-0.177-0.793 0.177s-0.912 1.147-1.117 1.383c-0.205 0.235-0.41 0.265-0.763 0.088s-1.487-0.548-2.833-1.748c-1.048-0.935-1.755-2.090-1.960-2.443s-0.022-0.543 0.155-0.720c0.159-0.159 0.353-0.41 0.530-0.617 0.177-0.205 0.235-0.353 0.353-0.587 0.117-0.235 0.058-0.44-0.030-0.617s-0.793-1.913-1.087-2.618c-0.287-0.687-0.578-0.593-0.793-0.605-0.205-0.010-0.44-0.012-0.675-0.012s-0.617 0.088-0.940 0.44c-0.323 0.353-1.235 1.207-1.235 2.943s1.265 3.413 1.440 3.647c0.177 0.235 2.465 3.825 6.005 5.327 0.84 0.357 1.495 0.570 2.007 0.730 0.847 0.267 1.618 0.230 2.227 0.140 0.68-0.102 2.085-0.852 2.380-1.675s0.295-1.528 0.205-1.675c-0.088-0.147-0.323-0.235-0.675-0.41z"/>
+    </svg>
+  </a>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-section">
+          <h3>House of Elleora</h3>
+          <p>Empowering women, one accessory at a time</p>
+          <p style="margin-top: 10px; font-style: italic;">"Her Aura, Her Charm"</p>
+        </div>
+        <div class="footer-section">
+          <h4>Contact</h4>
+          <p>📧 Email: info@houseofelleora.com</p>
+          <p>📞 Phone: +91 9488639502</p>
+          <p>💬 WhatsApp: +91 9488639502</p>
+        </div>
+        <div class="footer-section">
+          <h4>Follow Us</h4>
+          <div class="social-links">
+            <a href="https://www.instagram.com/house.of.elleora" target="_blank" aria-label="Instagram">📷 Instagram</a>
+            <a href="https://wa.me/919488639502" target="_blank" aria-label="WhatsApp">💬 WhatsApp</a>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 House of Elleora. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="enhanced-script.js"></script>
+</body>
+</html>
