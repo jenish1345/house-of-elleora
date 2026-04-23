@@ -67,7 +67,7 @@ function displayProducts() {
         ${isNew ? '<span class="badge badge-new">NEW</span>' : ''}
         ${isLowStock ? `<span class="badge badge-low-stock">Only ${product.stock} left!</span>` : ''}
         
-        <div class="product-image-wrapper" onclick="openQuickView('${product.id}')"
+        <div class="product-image-wrapper" onclick="openQuickView('${product.id}')">
           <img src="${product.image}" 
                alt="${product.name}" 
                class="product-image" 
