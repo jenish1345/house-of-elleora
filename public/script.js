@@ -2,7 +2,6 @@
 let allProducts = [];
 let currentFilter = 'all';
 let currentSort = 'newest';
-let searchQuery = '';
 
 // Load products with loading state
 async function loadProducts() {
@@ -42,10 +41,7 @@ function displayProducts() {
   // Apply filters
   let filtered = allProducts.filter(product => {
     const matchesCategory = currentFilter === 'all' || product.category === currentFilter;
-    const matchesSearch = !searchQuery || 
-      product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      product.category.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesCategory && matchesSearch;
+    return matchesCategory;
   });
 
   // Apply sorting
@@ -56,7 +52,7 @@ function displayProducts() {
       <div class="no-results">
         <div class="no-results-icon">🔍</div>
         <h3>No products found</h3>
-        <p>${searchQuery ? `No results for "${searchQuery}"` : 'No products in this category'}</p>
+        <p>No products in this category</p>
       </div>
     `;
     return;
@@ -154,17 +150,6 @@ function updateCategoryCounts() {
   });
 }
 
-// Search functionality
-function initSearch() {
-  const searchInput = document.getElementById('searchInput');
-  if (!searchInput) return;
-  
-  searchInput.addEventListener('input', (e) => {
-    searchQuery = e.target.value.trim();
-    displayProducts();
-  });
-}
-
 // Sort functionality
 function initSort() {
   const sortSelect = document.getElementById('sortSelect');
@@ -255,7 +240,6 @@ function initBackToTop() {
 // Initialize all features
 document.addEventListener('DOMContentLoaded', () => {
   loadProducts();
-  initSearch();
   initSort();
   initBackToTop();
 });
