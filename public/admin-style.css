@@ -163,6 +163,40 @@ small {
   flex: 1;
 }
 
+.stock-control {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-top: 5px;
+}
+
+.stock-buttons {
+  display: flex;
+  gap: 5px;
+}
+
+.btn-stock {
+  background: #d97398;
+  color: white;
+  border: none;
+  width: 30px;
+  height: 30px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 18px;
+  font-weight: bold;
+  transition: all 0.3s;
+}
+
+.btn-stock:hover {
+  background: #c55a7f;
+  transform: scale(1.1);
+}
+
+.btn-stock:active {
+  transform: scale(0.95);
+}
+
 .product-details h3 {
   margin-bottom: 5px;
   color: #333;

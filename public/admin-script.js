@@ -4,7 +4,7 @@ let editingId = null;
 // Load products
 async function loadProducts() {
   try {
-    const response = await fetch('https://houseofelleora.vercel.app/api/products');
+    const response = await fetch('/api/products');
     products = await response.json();
     displayProducts();
   } catch (error) {
@@ -28,9 +28,15 @@ function displayProducts() {
         <h3>${product.name}</h3>
         <p class="category">${product.category}</p>
         <p class="price">₹${product.price}</p>
-        <p class="stock ${product.stock < 5 ? 'low-stock' : ''}">
-          Stock: ${product.stock} ${product.stock < 5 ? '⚠️' : ''}
-        </p>
+        <div class="stock-control">
+          <p class="stock ${product.stock < 5 ? 'low-stock' : ''}">
+            Stock: ${product.stock} ${product.stock < 5 ? '⚠️' : ''}
+          </p>
+          <div class="stock-buttons">
+            <button class="btn-stock" onclick="adjustStock('${product.id}', -1)" title="Decrease stock">-</button>
+            <button class="btn-stock" onclick="adjustStock('${product.id}', 1)" title="Increase stock">+</button>
+          </div>
+        </div>
       </div>
       <div class="product-actions">
         <button class="btn-edit" onclick="editProduct('${product.id}')">Edit</button>
@@ -38,6 +44,35 @@ function displayProducts() {
       </div>
     </div>
   `).join('');
+}
+
+// Adjust stock quantity
+async function adjustStock(id, change) {
+  const product = products.find(p => p.id === id);
+  if (!product) return;
+  
+  const newStock = Math.max(0, product.stock + change); // Don't go below 0
+  
+  try {
+    const response = await fetch(`/api/products?id=${id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        ...product,
+        stock: newStock
+      })
+    });
+
+    if (response.ok) {
+      loadProducts(); // Refresh the list
+    } else {
+      alert('Error updating stock');
+    }
+  } catch (error) {
+    alert('Error updating stock: ' + error.message);
+  }
 }
 
 // Handle form submission
@@ -63,7 +98,7 @@ document.getElementById('productForm').addEventListener('submit', async (e) => {
   }
 
   try {
-    const url = editingId ? `https://houseofelleora.vercel.app/api/products?id=${editingId}` : 'https://houseofelleora.vercel.app/api/products';
+    const url = editingId ? `/api/products?id=${editingId}` : '/api/products';
     const method = editingId ? 'PUT' : 'POST';
     
     const response = await fetch(url, {
@@ -119,7 +154,7 @@ async function deleteProduct(id) {
   if (!confirm('Are you sure you want to delete this product?')) return;
 
   try {
-    const response = await fetch(`https://houseofelleora.vercel.app/api/products?id=${id}`, {
+    const response = await fetch(`/api/products?id=${id}`, {
       method: 'DELETE'
     });
 
