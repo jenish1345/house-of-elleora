@@ -100,28 +100,32 @@ document.getElementById('productForm').addEventListener('submit', async (e) => {
       // Generate unique product ID
       const productId = editingId || Date.now().toString();
       
-      // Create FormData for Cloudinary upload
-      const formData = new FormData();
-      formData.append('file', imageFile);
-      formData.append('upload_preset', 'ml_default'); // Cloudinary unsigned preset
-      formData.append('public_id', `house-of-elleora/product-${productId}`);
-      formData.append('folder', 'house-of-elleora');
+      // Convert image to base64
+      const base64Image = await new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result);
+        reader.readAsDataURL(imageFile);
+      });
       
-      // Upload to Cloudinary
-      const cloudinaryResponse = await fetch(
-        'https://api.cloudinary.com/v1_1/duqkjg5me/image/upload',
-        {
-          method: 'POST',
-          body: formData
-        }
-      );
+      // Upload to Cloudinary via backend function
+      const uploadResponse = await fetch('/api/upload-image', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          image: base64Image,
+          productId: productId
+        })
+      });
       
-      if (!cloudinaryResponse.ok) {
-        throw new Error('Failed to upload image to Cloudinary');
+      if (!uploadResponse.ok) {
+        const errorData = await uploadResponse.json();
+        throw new Error(errorData.error || 'Failed to upload image');
       }
       
-      const cloudinaryData = await cloudinaryResponse.json();
-      imageUrl = cloudinaryData.secure_url;
+      const uploadData = await uploadResponse.json();
+      imageUrl = uploadData.url;
       
       submitBtn.textContent = 'Saving product...';
     } catch (error) {
