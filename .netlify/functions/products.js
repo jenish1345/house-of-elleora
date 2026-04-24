@@ -47,11 +47,14 @@ exports.handler = async (event, context) => {
     }
 
     if (event.httpMethod === 'POST') {
-      const { name, description, price, category, stock, image } = JSON.parse(event.body);
+      const { id, name, description, price, category, stock, image } = JSON.parse(event.body);
+      
+      // Generate ID if not provided
+      const productId = id || Date.now().toString();
       
       const result = await pool.query(
-        'INSERT INTO products (name, description, price, category, stock, image) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
-        [name, description, price, category, stock, image]
+        'INSERT INTO products (id, name, description, price, category, stock, image) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *',
+        [productId, name, description, price, category, stock, image]
       );
       
       return {

@@ -86,18 +86,60 @@ document.getElementById('productForm').addEventListener('submit', async (e) => {
   const description = document.getElementById('description').value;
   const imageFile = document.getElementById('image').files[0];
   
-  let imageData = '/images/placeholder.jpg';
+  let imageUrl = '/images/placeholder.jpg';
   
-  // Convert image to base64 if uploaded
+  // Upload image to Cloudinary if provided
   if (imageFile) {
-    imageData = await new Promise((resolve) => {
-      const reader = new FileReader();
-      reader.onloadend = () => resolve(reader.result);
-      reader.readAsDataURL(imageFile);
-    });
+    try {
+      // Show loading message
+      const submitBtn = document.querySelector('.btn-primary');
+      const originalText = submitBtn.textContent;
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Uploading image...';
+      
+      // Generate unique product ID
+      const productId = editingId || Date.now().toString();
+      
+      // Create FormData for Cloudinary upload
+      const formData = new FormData();
+      formData.append('file', imageFile);
+      formData.append('upload_preset', 'ml_default'); // Cloudinary unsigned preset
+      formData.append('public_id', `house-of-elleora/product-${productId}`);
+      formData.append('folder', 'house-of-elleora');
+      
+      // Upload to Cloudinary
+      const cloudinaryResponse = await fetch(
+        'https://api.cloudinary.com/v1_1/duqkjg5me/image/upload',
+        {
+          method: 'POST',
+          body: formData
+        }
+      );
+      
+      if (!cloudinaryResponse.ok) {
+        throw new Error('Failed to upload image to Cloudinary');
+      }
+      
+      const cloudinaryData = await cloudinaryResponse.json();
+      imageUrl = cloudinaryData.secure_url;
+      
+      submitBtn.textContent = 'Saving product...';
+    } catch (error) {
+      alert('Error uploading image: ' + error.message);
+      document.querySelector('.btn-primary').disabled = false;
+      document.querySelector('.btn-primary').textContent = originalText;
+      return;
+    }
+  } else if (editingId) {
+    // If editing and no new image, keep the old image
+    const product = products.find(p => p.id === editingId);
+    if (product) {
+      imageUrl = product.image;
+    }
   }
 
   try {
+    const productId = editingId || Date.now().toString();
     const url = editingId ? `/api/products?id=${editingId}` : '/api/products';
     const method = editingId ? 'PUT' : 'POST';
     
@@ -107,12 +149,13 @@ document.getElementById('productForm').addEventListener('submit', async (e) => {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
+        id: productId,
         name,
         category,
         price: parseFloat(price),
         stock: parseInt(stock),
         description,
-        image: imageData
+        image: imageUrl
       })
     });
 
@@ -127,6 +170,9 @@ document.getElementById('productForm').addEventListener('submit', async (e) => {
   } catch (error) {
     alert('Error saving product: ' + error.message);
     console.error('Error:', error);
+  } finally {
+    document.querySelector('.btn-primary').disabled = false;
+    document.querySelector('.btn-primary').textContent = editingId ? 'Update Product' : 'Add Product';
   }
 });
 
