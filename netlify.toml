@@ -11,3 +11,4 @@
 [functions]
   node_bundler = "esbuild"
   external_node_modules = ["pg"]
+  included_files = ["products-data.json"]

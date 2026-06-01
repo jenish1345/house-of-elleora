@@ -1,18 +1,7 @@
 const { Pool } = require('pg');
-const fs = require('fs');
-const path = require('path');
 
-// Load products data from JSON file
-let FALLBACK_PRODUCTS = [];
-try {
-  const productsDataPath = path.join(__dirname, 'products-data.json');
-  if (fs.existsSync(productsDataPath)) {
-    FALLBACK_PRODUCTS = JSON.parse(fs.readFileSync(productsDataPath, 'utf8'));
-    console.log(`Loaded ${FALLBACK_PRODUCTS.length} products from products-data.json`);
-  }
-} catch (error) {
-  console.error('Error loading products-data.json:', error.message);
-}
+// All 115 products embedded directly (loaded from database)
+const FALLBACK_PRODUCTS = require('./products-data.json');
 
 exports.handler = async (event, context) => {
   const headers = {
@@ -43,61 +32,52 @@ exports.handler = async (event, context) => {
       
       if (hasDatabase) {
         // Use database if available
-        if (id) {
-          const result = await pool.query('SELECT * FROM products WHERE id = $1', [id]);
-          return {
-            statusCode: 200,
-            headers,
-            body: JSON.stringify(result.rows[0] || null)
-          };
-        }
-        
-        // Return only products with Cloudinary images (exclude base64)
-        const result = await pool.query(`
-          SELECT id, name, description, price, category, stock, image, created_at 
-          FROM products 
-          WHERE image LIKE 'https://res.cloudinary.com%'
-          ORDER BY created_at DESC
-        `);
-        
-        return {
-          statusCode: 200,
-          headers,
-          body: JSON.stringify(result.rows)
-        };
-      } else {
-        // Fallback to products.json or embedded data if no database
-        let products = FALLBACK_PRODUCTS;
-        
-        // Try to read from products.json if available
         try {
-          const productsPath = path.join(__dirname, '../../products.json');
-          if (fs.existsSync(productsPath)) {
-            const data = fs.readFileSync(productsPath, 'utf8');
-            products = JSON.parse(data);
-            console.log('Loaded products from products.json');
-          } else {
-            console.log('Using fallback embedded products');
+          if (id) {
+            const result = await pool.query('SELECT * FROM products WHERE id = $1', [id]);
+            return {
+              statusCode: 200,
+              headers,
+              body: JSON.stringify(result.rows[0] || null)
+            };
           }
-        } catch (error) {
-          console.error('Error reading products.json, using fallback:', error.message);
-        }
-        
-        if (id) {
-          const product = products.find(p => p.id === id);
+          
+          // Return only products with Cloudinary images (exclude base64)
+          const result = await pool.query(`
+            SELECT id, name, description, price, category, stock, image, created_at 
+            FROM products 
+            WHERE image LIKE 'https://res.cloudinary.com%'
+            ORDER BY created_at DESC
+          `);
+          
           return {
             statusCode: 200,
             headers,
-            body: JSON.stringify(product || null)
+            body: JSON.stringify(result.rows)
           };
+        } catch (dbError) {
+          console.error('Database error, falling back to static data:', dbError.message);
+          // Fall through to fallback data
         }
-        
+      }
+      
+      // Fallback to embedded products data
+      console.log(`Using fallback products data: ${FALLBACK_PRODUCTS.length} products`);
+      
+      if (id) {
+        const product = FALLBACK_PRODUCTS.find(p => p.id === id);
         return {
           statusCode: 200,
           headers,
-          body: JSON.stringify(products)
+          body: JSON.stringify(product || null)
         };
       }
+      
+      return {
+        statusCode: 200,
+        headers,
+        body: JSON.stringify(FALLBACK_PRODUCTS)
+      };
     }
 
     if (event.httpMethod === 'POST') {
@@ -105,7 +85,7 @@ exports.handler = async (event, context) => {
         return {
           statusCode: 503,
           headers,
-          body: JSON.stringify({ error: 'Database not configured. Please set POSTGRES_URL environment variable.' })
+          body: JSON.stringify({ error: 'Database not configured. Please set POSTGRES_URL environment variable to add products.' })
         };
       }
       
@@ -131,7 +111,7 @@ exports.handler = async (event, context) => {
         return {
           statusCode: 503,
           headers,
-          body: JSON.stringify({ error: 'Database not configured. Please set POSTGRES_URL environment variable.' })
+          body: JSON.stringify({ error: 'Database not configured. Please set POSTGRES_URL environment variable to update products.' })
         };
       }
       
@@ -154,7 +134,7 @@ exports.handler = async (event, context) => {
         return {
           statusCode: 503,
           headers,
-          body: JSON.stringify({ error: 'Database not configured. Please set POSTGRES_URL environment variable.' })
+          body: JSON.stringify({ error: 'Database not configured. Please set POSTGRES_URL environment variable to delete products.' })
         };
       }
       
@@ -169,7 +149,7 @@ exports.handler = async (event, context) => {
     }
 
   } catch (error) {
-    console.error('Database error:', error);
+    console.error('Error:', error);
     return {
       statusCode: 500,
       headers,
