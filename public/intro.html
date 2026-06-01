@@ -246,21 +246,11 @@
   </div>
 
   <script>
-    // Check if intro has been seen
-    const introSeen = localStorage.getItem('elleora_intro_seen');
-    
-    if (introSeen === 'true') {
-      // Skip intro if already seen
-      window.location.href = 'main-site.html';
-    } else {
-      // Show intro and mark as seen
-      localStorage.setItem('elleora_intro_seen', 'true');
-      
-      // Auto-redirect after 5 seconds
-      setTimeout(() => {
-        fadeOutAndRedirect();
-      }, 5000);
-    }
+    // Always show intro - no localStorage check
+    // Auto-redirect after 5 seconds
+    setTimeout(() => {
+      fadeOutAndRedirect();
+    }, 5000);
 
     function skipIntro() {
       fadeOutAndRedirect();
