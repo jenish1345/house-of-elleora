@@ -211,7 +211,7 @@
     
     if (introSeen === 'true') {
       // Skip intro if already seen
-      window.location.href = 'index.html';
+      window.location.href = 'main-site.html';
     } else {
       // Show intro and mark as seen
       localStorage.setItem('elleora_intro_seen', 'true');
@@ -230,7 +230,7 @@
       const container = document.getElementById('introContainer');
       container.classList.add('fade-out');
       setTimeout(() => {
-        window.location.href = 'index.html';
+        window.location.href = 'main-site.html';
       }, 800);
     }
 
