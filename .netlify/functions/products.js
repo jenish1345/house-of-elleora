@@ -1,4 +1,6 @@
 const { Pool } = require('pg');
+const fs = require('fs');
+const path = require('path');
 
 exports.handler = async (event, context) => {
   const headers = {
@@ -12,41 +14,85 @@ exports.handler = async (event, context) => {
     return { statusCode: 200, headers, body: '' };
   }
 
-  const pool = new Pool({
-    connectionString: process.env.POSTGRES_URL,
-    ssl: { rejectUnauthorized: false }
-  });
+  // Check if database is configured
+  const hasDatabase = !!process.env.POSTGRES_URL;
+  
+  let pool;
+  if (hasDatabase) {
+    pool = new Pool({
+      connectionString: process.env.POSTGRES_URL,
+      ssl: { rejectUnauthorized: false }
+    });
+  }
 
   try {
     if (event.httpMethod === 'GET') {
       const id = event.queryStringParameters?.id;
       
-      // If requesting a single product, return it
-      if (id) {
-        const result = await pool.query('SELECT * FROM products WHERE id = $1', [id]);
+      if (hasDatabase) {
+        // Use database if available
+        if (id) {
+          const result = await pool.query('SELECT * FROM products WHERE id = $1', [id]);
+          return {
+            statusCode: 200,
+            headers,
+            body: JSON.stringify(result.rows[0] || null)
+          };
+        }
+        
+        // Return only products with Cloudinary images (exclude base64)
+        const result = await pool.query(`
+          SELECT id, name, description, price, category, stock, image, created_at 
+          FROM products 
+          WHERE image LIKE 'https://res.cloudinary.com%'
+          ORDER BY created_at DESC
+        `);
+        
         return {
           statusCode: 200,
           headers,
-          body: JSON.stringify(result.rows[0] || null)
+          body: JSON.stringify(result.rows)
+        };
+      } else {
+        // Fallback to products.json if no database
+        const productsPath = path.join(__dirname, '../../products.json');
+        let products = [];
+        
+        try {
+          if (fs.existsSync(productsPath)) {
+            const data = fs.readFileSync(productsPath, 'utf8');
+            products = JSON.parse(data);
+          }
+        } catch (error) {
+          console.error('Error reading products.json:', error);
+        }
+        
+        if (id) {
+          const product = products.find(p => p.id === id);
+          return {
+            statusCode: 200,
+            headers,
+            body: JSON.stringify(product || null)
+          };
+        }
+        
+        return {
+          statusCode: 200,
+          headers,
+          body: JSON.stringify(products)
         };
       }
-      
-      // Return only products with Cloudinary images (exclude base64)
-      const result = await pool.query(`
-        SELECT id, name, description, price, category, stock, image, created_at 
-        FROM products 
-        WHERE image LIKE 'https://res.cloudinary.com%'
-        ORDER BY created_at DESC
-      `);
-      
-      return {
-        statusCode: 200,
-        headers,
-        body: JSON.stringify(result.rows)
-      };
     }
 
     if (event.httpMethod === 'POST') {
+      if (!hasDatabase) {
+        return {
+          statusCode: 503,
+          headers,
+          body: JSON.stringify({ error: 'Database not configured. Please set POSTGRES_URL environment variable.' })
+        };
+      }
+      
       const { id, name, description, price, category, stock, image } = JSON.parse(event.body);
       
       // Generate ID if not provided
@@ -65,6 +111,14 @@ exports.handler = async (event, context) => {
     }
 
     if (event.httpMethod === 'PUT') {
+      if (!hasDatabase) {
+        return {
+          statusCode: 503,
+          headers,
+          body: JSON.stringify({ error: 'Database not configured. Please set POSTGRES_URL environment variable.' })
+        };
+      }
+      
       const { id, name, description, price, category, stock, image } = JSON.parse(event.body);
       
       const result = await pool.query(
@@ -80,6 +134,14 @@ exports.handler = async (event, context) => {
     }
 
     if (event.httpMethod === 'DELETE') {
+      if (!hasDatabase) {
+        return {
+          statusCode: 503,
+          headers,
+          body: JSON.stringify({ error: 'Database not configured. Please set POSTGRES_URL environment variable.' })
+        };
+      }
+      
       const id = event.queryStringParameters.id;
       await pool.query('DELETE FROM products WHERE id=$1', [id]);
       
@@ -98,6 +160,8 @@ exports.handler = async (event, context) => {
       body: JSON.stringify({ error: error.message })
     };
   } finally {
-    await pool.end();
+    if (pool) {
+      await pool.end();
+    }
   }
 };
