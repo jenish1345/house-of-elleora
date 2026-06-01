@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>House of Elleora</title>
+  <script>
+    // Check if intro has been seen
+    const introSeen = localStorage.getItem('elleora_intro_seen');
+    
+    if (introSeen === 'true') {
+      // Go directly to main site
+      window.location.href = 'index.html';
+    } else {
+      // Show intro first
+      window.location.href = 'intro.html';
+    }
+  </script>
+</head>
+<body>
+  <p style="text-align: center; margin-top: 50px; font-family: Arial, sans-serif;">Loading...</p>
+</body>
+</html>

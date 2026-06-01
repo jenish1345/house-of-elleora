@@ -3,13 +3,67 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="House of Elleora - Elegant accessories for modern women and kids">
-  <title>House of Elleora - Exquisite Women's Accessories</title>
+  
+  <!-- SEO Meta Tags -->
+  <meta name="description" content="House of Elleora - Shop elegant women's accessories including hair clips, hairbands, earrings, bracelets & chains. Free delivery on orders above ₹1000. Fast shipping across India.">
+  <meta name="keywords" content="women accessories, hair clips, hairbands, earrings, bracelets, chains, kids accessories, fashion jewelry, online shopping India, House of Elleora">
+  <meta name="author" content="House of Elleora">
+  <meta name="robots" content="index, follow">
+  <meta name="language" content="English">
+  <meta name="revisit-after" content="7 days">
+  
+  <!-- Open Graph Meta Tags for Social Media -->
+  <meta property="og:title" content="House of Elleora - Exquisite Women's Accessories">
+  <meta property="og:description" content="Discover elegant accessories for modern women. Shop hair clips, earrings, bracelets & more. Free delivery on orders above ₹1000.">
+  <meta property="og:image" content="https://yourdomain.com/logo.png">
+  <meta property="og:url" content="https://yourdomain.com">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="House of Elleora">
+  
+  <!-- Twitter Card Meta Tags -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="House of Elleora - Exquisite Women's Accessories">
+  <meta name="twitter:description" content="Shop elegant women's accessories. Free delivery on orders above ₹1000.">
+  <meta name="twitter:image" content="https://yourdomain.com/logo.png">
+  
+  <!-- Canonical URL -->
+  <link rel="canonical" href="https://yourdomain.com">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="/logo.png">
+  
+  <title>House of Elleora - Exquisite Women's Accessories | Shop Hair Clips, Earrings & More</title>
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="enhanced-style.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+  
+  <!-- Structured Data (JSON-LD) for SEO -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Store",
+    "name": "House of Elleora",
+    "description": "Elegant women's accessories including hair clips, hairbands, earrings, bracelets and chains",
+    "url": "https://yourdomain.com",
+    "logo": "https://yourdomain.com/logo.png",
+    "image": "https://yourdomain.com/logo.png",
+    "telephone": "+919488639502",
+    "email": "info@houseofelleora.com",
+    "address": {
+      "@type": "PostalAddress",
+      "addressCountry": "IN"
+    },
+    "priceRange": "₹₹",
+    "openingHours": "Mo-Su 09:00-21:00",
+    "sameAs": [
+      "https://www.instagram.com/house.of.elleora"
+    ],
+    "paymentAccepted": "UPI, Google Pay, PhonePe, Paytm",
+    "currenciesAccepted": "INR"
+  }
+  </script>
 </head>
 <body>
   <!-- Navigation -->
@@ -22,6 +76,9 @@
         </div>
       </div>
       <div class="nav-actions">
+        <button class="wishlist-btn" onclick="toggleWishlistSidebar()" title="My Wishlist">
+          ❤️ <span class="wishlist-count">0</span>
+        </button>
         <a href="https://wa.me/919488639502?text=Hi!%20I'm%20interested%20in%20your%20accessories" class="whatsapp-order-btn">
           💬 Order on WhatsApp
         </a>
@@ -121,6 +178,60 @@
   </div>
 
   <div class="overlay" id="overlay" onclick="closeQuickView()"></div>
+
+  <!-- Wishlist Sidebar -->
+  <div class="wishlist-sidebar" id="wishlistSidebar">
+    <div class="wishlist-header">
+      <h3>❤️ My Wishlist</h3>
+      <button class="close-wishlist" onclick="toggleWishlistSidebar()">×</button>
+    </div>
+    <div class="wishlist-items" id="wishlistItems"></div>
+    <div class="wishlist-footer">
+      <p class="wishlist-note">💡 Items in your wishlist are saved for later</p>
+    </div>
+  </div>
+
+  <!-- Review Modal -->
+  <div id="reviewModal" class="modal">
+    <div class="review-modal-content">
+      <div class="modal-header">
+        <h3>Write a Review</h3>
+        <button class="close-modal" onclick="closeReviewModal()">×</button>
+      </div>
+      <form id="reviewForm" class="review-form">
+        <input type="hidden" id="reviewProductId">
+        <div class="form-group">
+          <label>Your Name *</label>
+          <input type="text" id="reviewName" required>
+        </div>
+        <div class="form-group">
+          <label>Rating *</label>
+          <div class="star-rating" id="starRating">
+            <span class="star" data-rating="1">☆</span>
+            <span class="star" data-rating="2">☆</span>
+            <span class="star" data-rating="3">☆</span>
+            <span class="star" data-rating="4">☆</span>
+            <span class="star" data-rating="5">☆</span>
+          </div>
+          <input type="hidden" id="reviewRating" required>
+        </div>
+        <div class="form-group">
+          <label>Your Review *</label>
+          <textarea id="reviewText" rows="4" required placeholder="Share your experience with this product..."></textarea>
+        </div>
+        <div class="form-group">
+          <label>Email (optional - for verification)</label>
+          <input type="email" id="reviewEmail" placeholder="your@email.com">
+        </div>
+        <button type="submit" class="btn btn-primary">Submit Review</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Email Notification Toast -->
+  <div id="emailToast" class="email-toast">
+    <span id="emailToastMessage"></span>
+  </div>
 
   <!-- Back to Top Button -->
   <button id="backToTop" title="Back to top">↑</button>
