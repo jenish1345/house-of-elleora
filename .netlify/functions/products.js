@@ -2,6 +2,20 @@ const { Pool } = require('pg');
 const fs = require('fs');
 const path = require('path');
 
+// Fallback products data (embedded)
+const FALLBACK_PRODUCTS = [
+  {
+    "id": "1773942848092",
+    "name": "Korean clips black themed 🖤 ",
+    "category": "Hair Clips",
+    "price": 20,
+    "stock": 20,
+    "description": "Lost in the shadows where emotions speak louder than words 🖤\r\nDark aesthetics, deep feelings, and cinematic Korean vibes in every frame ✨",
+    "image": "https://res.cloudinary.com/duqkjg5me/image/upload/v1780332526/house-of-elleora/product-1773942848092.jpg",
+    "createdAt": "2026-03-19T17:54:08.092Z"
+  }
+];
+
 exports.handler = async (event, context) => {
   const headers = {
     'Access-Control-Allow-Origin': '*',
@@ -54,17 +68,21 @@ exports.handler = async (event, context) => {
           body: JSON.stringify(result.rows)
         };
       } else {
-        // Fallback to products.json if no database
-        const productsPath = path.join(__dirname, '../../products.json');
-        let products = [];
+        // Fallback to products.json or embedded data if no database
+        let products = FALLBACK_PRODUCTS;
         
+        // Try to read from products.json if available
         try {
+          const productsPath = path.join(__dirname, '../../products.json');
           if (fs.existsSync(productsPath)) {
             const data = fs.readFileSync(productsPath, 'utf8');
             products = JSON.parse(data);
+            console.log('Loaded products from products.json');
+          } else {
+            console.log('Using fallback embedded products');
           }
         } catch (error) {
-          console.error('Error reading products.json:', error);
+          console.error('Error reading products.json, using fallback:', error.message);
         }
         
         if (id) {
