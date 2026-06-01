@@ -41,7 +41,7 @@
       pointer-events: none;
     }
 
-    /* Skip Button */
+    /* Skip Button - Top Right */
     .skip-btn {
       position: fixed;
       top: 25px;
@@ -64,6 +64,32 @@
       background: #d97398;
       color: #fff;
       border-color: #d97398;
+    }
+
+    /* Skip Button - Below Content (More Visible) */
+    .skip-btn-bottom {
+      background: #d97398;
+      border: none;
+      color: #fff;
+      padding: 12px 35px;
+      border-radius: 25px;
+      font-size: 0.9em;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 400;
+      letter-spacing: 1px;
+      margin-top: 40px;
+      opacity: 0;
+      animation: fadeInUp 0.8s ease-out forwards;
+      animation-delay: 2.5s;
+      box-shadow: 0 4px 15px rgba(217, 115, 152, 0.3);
+    }
+
+    .skip-btn-bottom:hover {
+      background: #c55a7f;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(217, 115, 152, 0.4);
     }
 
     /* Content Container */
@@ -171,6 +197,12 @@
         font-size: 0.8em;
       }
 
+      .skip-btn-bottom {
+        padding: 10px 30px;
+        font-size: 0.85em;
+        margin-top: 30px;
+      }
+
       .content {
         padding: 0 20px;
       }
@@ -188,12 +220,17 @@
       .tagline {
         font-size: 0.85em;
       }
+
+      .skip-btn-bottom {
+        padding: 10px 25px;
+        font-size: 0.8em;
+      }
     }
   </style>
 </head>
 <body>
   <div class="intro-container" id="introContainer">
-    <!-- Skip Button -->
+    <!-- Skip Button - Top Right (Subtle) -->
     <button class="skip-btn" onclick="skipIntro()">Skip</button>
 
     <!-- Content -->
@@ -202,6 +239,9 @@
       <div class="brand-name">House of Elleora</div>
       <div class="line"></div>
       <div class="tagline">Her Aura, Her Charm</div>
+      
+      <!-- Skip Button - Below Content (More Visible) -->
+      <button class="skip-btn-bottom" onclick="skipIntro()">Enter Store →</button>
     </div>
   </div>
 
