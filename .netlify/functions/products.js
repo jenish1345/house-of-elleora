@@ -2,19 +2,17 @@ const { Pool } = require('pg');
 const fs = require('fs');
 const path = require('path');
 
-// Fallback products data (embedded)
-const FALLBACK_PRODUCTS = [
-  {
-    "id": "1773942848092",
-    "name": "Korean clips black themed 🖤 ",
-    "category": "Hair Clips",
-    "price": 20,
-    "stock": 20,
-    "description": "Lost in the shadows where emotions speak louder than words 🖤\r\nDark aesthetics, deep feelings, and cinematic Korean vibes in every frame ✨",
-    "image": "https://res.cloudinary.com/duqkjg5me/image/upload/v1780332526/house-of-elleora/product-1773942848092.jpg",
-    "createdAt": "2026-03-19T17:54:08.092Z"
+// Load products data from JSON file
+let FALLBACK_PRODUCTS = [];
+try {
+  const productsDataPath = path.join(__dirname, 'products-data.json');
+  if (fs.existsSync(productsDataPath)) {
+    FALLBACK_PRODUCTS = JSON.parse(fs.readFileSync(productsDataPath, 'utf8'));
+    console.log(`Loaded ${FALLBACK_PRODUCTS.length} products from products-data.json`);
   }
-];
+} catch (error) {
+  console.error('Error loading products-data.json:', error.message);
+}
 
 exports.handler = async (event, context) => {
   const headers = {
