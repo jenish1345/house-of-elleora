@@ -61,13 +61,11 @@ function displayProducts() {
   container.innerHTML = filtered.map(product => {
     const isNew = isNewProduct(product.created_at);
     const isLowStock = product.stock > 0 && product.stock < 5;
-    const isAdmin = localStorage.getItem('adminAuth') === 'true';
     
     return `
       <div class="product-card" data-product-id="${product.id}">
         ${isNew ? '<span class="badge badge-new">NEW</span>' : ''}
         ${isLowStock ? `<span class="badge badge-low-stock">Only ${product.stock} left!</span>` : ''}
-        ${isAdmin ? '<span class="badge badge-admin">👤 Admin View</span>' : ''}
         
         <div class="product-image-wrapper" onclick="openQuickView('${product.id}')">
           <img src="${product.image}" 
@@ -84,25 +82,6 @@ function displayProducts() {
           <div class="product-category">${product.category}</div>
           <h3 class="product-name">${product.name}</h3>
           <p class="product-description">${product.description || ''}</p>
-          
-          ${isAdmin ? `
-            <div class="admin-product-controls">
-              <div class="admin-stock-info">
-                <strong>Stock:</strong> ${product.stock} units
-                <div class="admin-stock-buttons">
-                  <button onclick="adjustStockQuick('${product.id}', -1)" class="btn-stock-adjust">-</button>
-                  <button onclick="adjustStockQuick('${product.id}', 1)" class="btn-stock-adjust">+</button>
-                </div>
-              </div>
-              <div class="admin-price-info">
-                <strong>Price:</strong> ₹${product.price}
-              </div>
-              <div class="admin-actions">
-                <button onclick="editProductQuick('${product.id}')" class="btn-admin-edit">✏️ Edit</button>
-                <button onclick="deleteProductQuick('${product.id}', '${product.name.replace(/'/g, "\\'")}')" class="btn-admin-delete">🗑️ Delete</button>
-              </div>
-            </div>
-          ` : ''}
           
           <div class="product-footer">
             <span class="product-price">₹${product.price}</span>
@@ -717,108 +696,3 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 // ============================================
-// ADMIN FUNCTIONS
-// ============================================
-
-// Check if admin is logged in and show toolbar
-function checkAdminStatus() {
-  const isAdmin = localStorage.getItem('adminAuth') === 'true';
-  const toolbar = document.getElementById('adminToolbar');
-  if (toolbar && isAdmin) {
-    toolbar.style.display = 'block';
-  }
-}
-
-// Logout admin
-function logoutAdmin() {
-  if (confirm('Are you sure you want to logout?')) {
-    localStorage.removeItem('adminAuth');
-    window.location.reload();
-  }
-}
-
-// Quick adjust stock from homepage
-async function adjustStockQuick(productId, change) {
-  const product = allProducts.find(p => p.id === productId);
-  if (!product) return;
-  
-  const newStock = Math.max(0, product.stock + change);
-  
-  try {
-    const response = await fetch(`/api/products?id=${productId}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        ...product,
-        stock: newStock
-      })
-    });
-
-    if (response.ok) {
-      product.stock = newStock;
-      displayProducts();
-      showNotification(`Stock updated: ${product.name} now has ${newStock} units`);
-    } else {
-      showNotification('Error updating stock', 'error');
-    }
-  } catch (error) {
-    showNotification('Error updating stock: ' + error.message, 'error');
-  }
-}
-
-// Quick edit product
-function editProductQuick(productId) {
-  // Redirect to admin panel with edit mode
-  window.location.href = `admin.html?edit=${productId}`;
-}
-
-// Quick delete product
-async function deleteProductQuick(productId, productName) {
-  if (!confirm(`Are you sure you want to delete "${productName}"?`)) return;
-  
-  try {
-    const response = await fetch(`/api/products?id=${productId}`, {
-      method: 'DELETE'
-    });
-
-    if (response.ok) {
-      showNotification(`Product "${productName}" deleted successfully`);
-      // Remove from local array and refresh display
-      allProducts = allProducts.filter(p => p.id !== productId);
-      displayProducts();
-    } else {
-      showNotification('Error deleting product', 'error');
-    }
-  } catch (error) {
-    showNotification('Error deleting product: ' + error.message, 'error');
-  }
-}
-
-// Show notification
-function showNotification(message, type = 'success') {
-  const notification = document.createElement('div');
-  notification.className = `admin-notification ${type}`;
-  notification.textContent = message;
-  notification.style.cssText = `
-    position: fixed;
-    top: 80px;
-    right: 20px;
-    background: ${type === 'error' ? '#dc3545' : '#28a745'};
-    color: white;
-    padding: 15px 25px;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-    z-index: 10000;
-    animation: slideIn 0.3s ease;
-  `;
-  
-  document.body.appendChild(notification);
-  
-  setTimeout(() => {
-    notification.style.animation = 'slideOut 0.3s ease';
-    setTimeout(() => notification.remove(), 300);
-  }, 3000);
-}
-
-// Check admin status on page load
-checkAdminStatus();
