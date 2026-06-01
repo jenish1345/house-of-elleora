@@ -1,6 +1,20 @@
 let products = [];
 let editingId = null;
 
+// Check for edit parameter in URL
+window.addEventListener('DOMContentLoaded', () => {
+  const urlParams = new URLSearchParams(window.location.search);
+  const editId = urlParams.get('edit');
+  if (editId) {
+    // Wait for products to load, then edit
+    setTimeout(() => {
+      editProduct(editId);
+      // Scroll to form
+      document.getElementById('productForm').scrollIntoView({ behavior: 'smooth' });
+    }, 500);
+  }
+});
+
 // Load products
 async function loadProducts() {
   try {
