@@ -1,5 +1,8 @@
 const { Pool } = require('pg');
 
+// Database connection - use env variable or fallback to hardcoded connection
+const DB_URL = process.env.POSTGRES_URL || 'postgres://c0135a2403d9e2c9d6d193fb61c9735758a21ea8294c1981f649f4e7f551c6ed:sk_zOltAe07ew_IgXJNjPIME@db.prisma.io:5432/postgres?sslmode=require';
+
 exports.handler = async (event, context) => {
   const headers = {
     'Access-Control-Allow-Origin': '*',
@@ -13,7 +16,7 @@ exports.handler = async (event, context) => {
   }
 
   const pool = new Pool({
-    connectionString: process.env.POSTGRES_URL,
+    connectionString: DB_URL,
     ssl: { rejectUnauthorized: false }
   });
 
