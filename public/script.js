@@ -188,13 +188,21 @@ function contactWhatsApp(button) {
 }
 
 // Quick View Modal
+let currentQuickViewIndex = -1;
+let quickViewProducts = []; // the currently filtered/displayed list
+
 function openQuickView(productId) {
-  const product = allProducts.find(p => p.id == productId);
-  if (!product) return;
-  
+  // Sync with whatever is currently visible on screen
+  quickViewProducts = getFilteredProducts();
+  currentQuickViewIndex = quickViewProducts.findIndex(p => p.id == productId);
+  if (currentQuickViewIndex === -1) return;
+  renderQuickView(quickViewProducts[currentQuickViewIndex]);
+}
+
+function renderQuickView(product) {
   const modal = document.getElementById('quickViewModal');
   if (!modal) return;
-  
+
   document.getElementById('quickViewImage').src = product.image;
   document.getElementById('quickViewName').textContent = product.name;
   document.getElementById('quickViewCategory').textContent = product.category;
@@ -202,21 +210,56 @@ function openQuickView(productId) {
   document.getElementById('quickViewDescription').textContent = product.description || 'No description available';
   document.getElementById('quickViewStock').textContent = product.stock === 0 ? 'Out of Stock' : product.stock < 5 ? `Only ${product.stock} left!` : `${product.stock} in stock`;
   document.getElementById('quickViewStock').className = `product-stock ${product.stock < 5 ? 'low' : ''} ${product.stock === 0 ? 'out' : ''}`;
-  
+
   const orderBtn = document.getElementById('quickViewOrderBtn');
   orderBtn.disabled = product.stock === 0;
   orderBtn.onclick = () => {
     const message = `Hi! I'm interested in:\n\n*${product.name}*\nPrice: ₹${product.price}\n\n📸 Product Image:\n${product.image}\n\nCan you provide more details?`;
     window.open(`https://wa.me/919488639502?text=${encodeURIComponent(message)}`, '_blank');
   };
-  
+
+  // Update nav arrows
+  document.getElementById('qvPrev').style.opacity = currentQuickViewIndex === 0 ? '0.3' : '1';
+  document.getElementById('qvNext').style.opacity = currentQuickViewIndex === quickViewProducts.length - 1 ? '0.3' : '1';
+  document.getElementById('qvPrev').disabled = currentQuickViewIndex === 0;
+  document.getElementById('qvNext').disabled = currentQuickViewIndex === quickViewProducts.length - 1;
+
   modal.classList.add('active');
   document.getElementById('overlay').classList.add('active');
+
+  // Refresh reviews/ratings for the new product
+  if (typeof updateQuickViewRatings === 'function') updateQuickViewRatings(product.id);
+}
+
+function navigateProduct(direction) {
+  const newIndex = currentQuickViewIndex + direction;
+  if (newIndex < 0 || newIndex >= quickViewProducts.length) return;
+  currentQuickViewIndex = newIndex;
+  renderQuickView(quickViewProducts[currentQuickViewIndex]);
 }
 
 function closeQuickView() {
   document.getElementById('quickViewModal').classList.remove('active');
   document.getElementById('overlay').classList.remove('active');
+}
+
+// Returns the current filtered + sorted product list (mirrors displayProducts logic)
+function getFilteredProducts() {
+  let list = [...allProducts];
+  if (currentFilter !== 'all') {
+    list = list.filter(p => p.category === currentFilter);
+  }
+  // search filter
+  const searchInput = document.getElementById('searchInput');
+  if (searchInput && searchInput.value.trim()) {
+    const q = searchInput.value.trim().toLowerCase();
+    list = list.filter(p =>
+      p.name.toLowerCase().includes(q) ||
+      p.category.toLowerCase().includes(q) ||
+      (p.description && p.description.toLowerCase().includes(q))
+    );
+  }
+  return sortProducts(list);
 }
 
 // Back to top button

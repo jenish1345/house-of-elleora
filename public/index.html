@@ -164,7 +164,15 @@
   <!-- Quick View Modal -->
   <div id="quickViewModal" class="modal">
     <div class="quick-view-content">
-      <img id="quickViewImage" src="" alt="" class="quick-view-image">
+      <!-- Prev / Next arrows -->
+      <button class="qv-nav qv-prev" id="qvPrev" onclick="navigateProduct(-1)">&#8249;</button>
+      <button class="qv-nav qv-next" id="qvNext" onclick="navigateProduct(1)">&#8250;</button>
+
+      <button class="qv-close" onclick="closeQuickView()">&#10005;</button>
+
+      <div class="qv-image-col">
+        <img id="quickViewImage" src="" alt="" class="quick-view-image">
+      </div>
       <div class="quick-view-details">
         <div class="product-category" id="quickViewCategory"></div>
         <h2 id="quickViewName"></h2>
@@ -172,7 +180,7 @@
         <p class="product-description" id="quickViewDescription"></p>
         <div class="product-stock" id="quickViewStock"></div>
         <button id="quickViewOrderBtn">💬 Order on WhatsApp</button>
-        <button onclick="closeQuickView()" style="background: #ccc; margin-top: 10px;">Close</button>
+        <button onclick="closeQuickView()" class="qv-close-btn">✕ Close</button>
       </div>
     </div>
   </div>

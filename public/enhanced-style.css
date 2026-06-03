@@ -898,3 +898,85 @@
   z-index: 10;
 }
 
+
+
+/* ============================================
+   QUICK VIEW MODAL - NAVIGATION ARROWS
+   ============================================ */
+
+.quick-view-content {
+  position: relative;
+}
+
+/* Close button inside modal */
+.qv-close {
+  position: absolute;
+  top: 14px;
+  right: 16px;
+  background: rgba(0,0,0,0.08);
+  border: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  font-size: 16px;
+  cursor: pointer;
+  z-index: 10;
+  color: #555;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+.qv-close:hover { background: rgba(0,0,0,0.15); }
+
+/* Prev / Next arrows */
+.qv-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: white;
+  border: none;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  font-size: 28px;
+  line-height: 1;
+  cursor: pointer;
+  z-index: 10;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+  color: #d97398;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s, box-shadow 0.2s, opacity 0.2s;
+}
+.qv-nav:hover:not(:disabled) {
+  transform: translateY(-50%) scale(1.1);
+  box-shadow: 0 4px 18px rgba(217,115,152,0.35);
+}
+.qv-nav:disabled { cursor: default; }
+
+.qv-prev { left: -22px; }
+.qv-next { right: -22px; }
+
+/* Image column */
+.qv-image-col {
+  flex-shrink: 0;
+}
+
+/* Bottom close button */
+.qv-close-btn {
+  background: #e0e0e0 !important;
+  color: #555 !important;
+  margin-top: 10px;
+}
+.qv-close-btn:hover {
+  background: #ccc !important;
+}
+
+/* Mobile: arrows move inside the modal */
+@media (max-width: 640px) {
+  .qv-prev { left: 6px; top: 30%; }
+  .qv-next { right: 6px; top: 30%; }
+  .qv-nav { width: 36px; height: 36px; font-size: 22px; }
+}
