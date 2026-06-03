@@ -3,100 +3,247 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Panel - Manage Products</title>
+  <title>Admin - House of Elleora</title>
   <link rel="stylesheet" href="admin-style.css">
+  <style>
+    /* ── LOGIN SCREEN ── */
+    #loginScreen {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #f5c6d8 0%, #e8a0bf 50%, #d97398 100%);
+    }
+    .login-box {
+      background: white;
+      padding: 48px 40px;
+      border-radius: 24px;
+      box-shadow: 0 20px 60px rgba(217,115,152,0.25);
+      width: 90%;
+      max-width: 420px;
+      text-align: center;
+    }
+    .login-box .brand {
+      font-size: 2rem;
+      margin-bottom: 4px;
+    }
+    .login-box h2 {
+      color: #d97398;
+      font-size: 1.4rem;
+      margin-bottom: 6px;
+    }
+    .login-box .tagline {
+      color: #aaa;
+      font-size: 0.85rem;
+      margin-bottom: 32px;
+      font-style: italic;
+    }
+    .login-box .form-group {
+      text-align: left;
+      margin-bottom: 18px;
+    }
+    .login-box label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #555;
+      margin-bottom: 6px;
+    }
+    .login-box input {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid #f0d0dc;
+      border-radius: 10px;
+      font-size: 1rem;
+      outline: none;
+      box-sizing: border-box;
+      transition: border-color 0.2s;
+    }
+    .login-box input:focus {
+      border-color: #d97398;
+    }
+    .login-btn {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, #d97398, #c55a7f);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 8px;
+      letter-spacing: 0.5px;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .login-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(217,115,152,0.4);
+    }
+    .login-error {
+      color: #dc3545;
+      font-size: 0.88rem;
+      margin-top: 12px;
+      min-height: 20px;
+      font-weight: 600;
+    }
+
+    /* ── DASHBOARD ── */
+    #dashboard { display: none; }
+  </style>
 </head>
 <body>
+
+  <!-- ══════════════ LOGIN SCREEN ══════════════ -->
+  <div id="loginScreen">
+    <div class="login-box">
+      <div class="brand">🛍️</div>
+      <h2>House of Elleora</h2>
+      <p class="tagline">Admin Portal</p>
+
+      <form id="loginForm">
+        <div class="form-group">
+          <label>Username</label>
+          <input type="text" id="username" placeholder="Enter username" autocomplete="username" required>
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="password" placeholder="Enter password" autocomplete="current-password" required>
+        </div>
+        <button type="submit" class="login-btn">Login →</button>
+        <p class="login-error" id="loginError"></p>
+      </form>
+    </div>
+  </div>
+
+  <!-- ══════════════ ADMIN DASHBOARD ══════════════ -->
+  <div id="dashboard">
+
+    <header>
+      <div class="container">
+        <h1>🛍️ Admin Panel</h1>
+        <p>Manage your products &amp; orders</p>
+        <div class="notification-badge" id="newOrderBadge" style="display: none;">
+          🔔 New Orders!
+        </div>
+        <div class="header-actions">
+          <a href="index.html" class="view-shop-btn">View Shop</a>
+          <button onclick="logout()" class="logout-btn">Logout</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="container">
+      <div class="notification-info">
+        <p>📱 Orders refresh automatically every 30 seconds</p>
+        <p>🔔 You'll hear a sound when new orders arrive</p>
+      </div>
+
+      <section class="add-product-section">
+        <h2>Add New Product</h2>
+        <form id="productForm" enctype="multipart/form-data">
+          <input type="hidden" id="productId">
+
+          <div class="form-group">
+            <label>Product Name *</label>
+            <input type="text" id="name" required>
+          </div>
+
+          <div class="form-group">
+            <label>Category *</label>
+            <select id="category" required>
+              <option value="">Select Category</option>
+              <option value="Hair Clips">Hair Clips</option>
+              <option value="Hairbands">Hairbands</option>
+              <option value="Earrings">Earrings</option>
+              <option value="Bracelets">Bracelets</option>
+              <option value="Chains">Chains</option>
+              <option value="Kids Accessories">Kids Accessories</option>
+              <option value="Others">Others</option>
+            </select>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Price (₹) *</label>
+              <input type="number" id="price" min="0" step="0.01" required>
+            </div>
+            <div class="form-group">
+              <label>Stock Quantity *</label>
+              <input type="number" id="stock" min="0" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Description</label>
+            <textarea id="description" rows="3"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label>Product Image</label>
+            <input type="file" id="image" accept="image/*">
+            <small>Upload a clear image of the product</small>
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Add Product</button>
+            <button type="button" class="btn btn-secondary" id="cancelBtn" style="display: none;">Cancel</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="products-list-section">
+        <h2>Current Products</h2>
+        <div id="productsList"></div>
+      </section>
+
+      <section class="orders-section">
+        <h2>Recent Orders</h2>
+        <div id="ordersList"></div>
+      </section>
+    </main>
+
+  </div><!-- /#dashboard -->
+
   <script>
-    // Check authentication
-    if (localStorage.getItem('adminAuth') !== 'true') {
-      window.location.href = 'admin-login.html';
+    // ── Auth helpers ──────────────────────────────────────────────
+    function isLoggedIn() {
+      return localStorage.getItem('adminAuth') === 'true';
+    }
+
+    function showDashboard() {
+      document.getElementById('loginScreen').style.display = 'none';
+      document.getElementById('dashboard').style.display = 'block';
+    }
+
+    function logout() {
+      localStorage.removeItem('adminAuth');
+      document.getElementById('dashboard').style.display = 'none';
+      document.getElementById('loginScreen').style.display = 'flex';
+      document.getElementById('username').value = '';
+      document.getElementById('password').value = '';
+      document.getElementById('loginError').textContent = '';
+    }
+
+    // ── Login form ────────────────────────────────────────────────
+    document.getElementById('loginForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value;
+
+      if (username === 'elleora' && password === 'elleora2026') {
+        localStorage.setItem('adminAuth', 'true');
+        showDashboard();
+      } else {
+        document.getElementById('loginError').textContent = '❌ Invalid username or password';
+      }
+    });
+
+    // ── On page load: check if already logged in ──────────────────
+    if (isLoggedIn()) {
+      showDashboard();
     }
   </script>
-
-  <header>
-    <div class="container">
-      <h1>🛍️ Admin Panel</h1>
-      <p>Manage your products & orders</p>
-      <div class="notification-badge" id="newOrderBadge" style="display: none;">
-        🔔 New Orders!
-      </div>
-      <div class="header-actions">
-        <a href="index.html" class="view-shop-btn">View Shop</a>
-        <button onclick="logout()" class="logout-btn">Logout</button>
-      </div>
-    </div>
-  </header>
-
-  <main class="container">
-    <div class="notification-info">
-      <p>📱 Orders refresh automatically every 30 seconds</p>
-      <p>🔔 You'll hear a sound when new orders arrive</p>
-    </div>
-    <section class="add-product-section">
-      <h2>Add New Product</h2>
-      <form id="productForm" enctype="multipart/form-data">
-        <input type="hidden" id="productId">
-        
-        <div class="form-group">
-          <label>Product Name *</label>
-          <input type="text" id="name" required>
-        </div>
-
-        <div class="form-group">
-          <label>Category *</label>
-          <select id="category" required>
-            <option value="">Select Category</option>
-            <option value="Hair Clips">Hair Clips</option>
-            <option value="Hairbands">Hairbands</option>
-            <option value="Earrings">Earrings</option>
-            <option value="Bracelets">Bracelets</option>
-            <option value="Chains">Chains</option>
-            <option value="Kids Accessories">Kids Accessories</option>
-            <option value="Others">Others</option>
-          </select>
-        </div>
-
-        <div class="form-row">
-          <div class="form-group">
-            <label>Price (₹) *</label>
-            <input type="number" id="price" min="0" step="0.01" required>
-          </div>
-
-          <div class="form-group">
-            <label>Stock Quantity *</label>
-            <input type="number" id="stock" min="0" required>
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label>Description</label>
-          <textarea id="description" rows="3"></textarea>
-        </div>
-
-        <div class="form-group">
-          <label>Product Image</label>
-          <input type="file" id="image" accept="image/*">
-          <small>Upload a clear image of the product</small>
-        </div>
-
-        <div class="form-actions">
-          <button type="submit" class="btn btn-primary">Add Product</button>
-          <button type="button" class="btn btn-secondary" id="cancelBtn" style="display: none;">Cancel</button>
-        </div>
-      </form>
-    </section>
-
-    <section class="products-list-section">
-      <h2>Current Products</h2>
-      <div id="productsList"></div>
-    </section>
-
-    <section class="orders-section">
-      <h2>Recent Orders</h2>
-      <div id="ordersList"></div>
-    </section>
-  </main>
 
   <script src="admin-script.js"></script>
 </body>

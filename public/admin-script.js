@@ -400,8 +400,10 @@ setInterval(loadOrdersWithNotification, 30000);
 loadOrdersWithNotification();
 
 
-// Logout function
-function logout() {
-  localStorage.removeItem('adminAuth');
-  window.location.href = 'admin-login.html';
+// Logout function — defined in admin.html, referenced here for safety
+if (typeof logout === 'undefined') {
+  function logout() {
+    localStorage.removeItem('adminAuth');
+    window.location.reload();
+  }
 }
