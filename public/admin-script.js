@@ -1,3 +1,8 @@
+// Escape text before putting it into HTML (stops script injection via order/product fields)
+function esc(value) {
+  return String(value ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+
 let products = [];
 let editingId = null;
 
@@ -18,7 +23,7 @@ window.addEventListener('DOMContentLoaded', () => {
 // Load products
 async function loadProducts() {
   try {
-    const response = await fetch('/api/products');
+    const response = await authFetch('/api/products');
     products = await response.json();
     displayProducts();
   } catch (error) {
@@ -37,24 +42,24 @@ function displayProducts() {
 
   container.innerHTML = products.map(product => `
     <div class="product-item">
-      <img src="${product.image}" alt="${product.name}" class="product-thumb">
+      <img src="${esc(product.image)}" alt="${esc(product.name)}" class="product-thumb">
       <div class="product-details">
-        <h3>${product.name}</h3>
-        <p class="category">${product.category}</p>
+        <h3>${esc(product.name)}</h3>
+        <p class="category">${esc(product.category)}</p>
         <p class="price">₹${product.price}</p>
         <div class="stock-control">
           <p class="stock ${product.stock < 5 ? 'low-stock' : ''}">
             Stock: ${product.stock} ${product.stock < 5 ? '⚠️' : ''}
           </p>
           <div class="stock-buttons">
-            <button class="btn-stock" onclick="adjustStock('${product.id}', -1)" title="Decrease stock">-</button>
-            <button class="btn-stock" onclick="adjustStock('${product.id}', 1)" title="Increase stock">+</button>
+            <button class="btn-stock" onclick="adjustStock('${esc(product.id)}', -1)" title="Decrease stock">-</button>
+            <button class="btn-stock" onclick="adjustStock('${esc(product.id)}', 1)" title="Increase stock">+</button>
           </div>
         </div>
       </div>
       <div class="product-actions">
-        <button class="btn-edit" onclick="editProduct('${product.id}')">Edit</button>
-        <button class="btn-delete" onclick="deleteProduct('${product.id}')">Delete</button>
+        <button class="btn-edit" onclick="editProduct('${esc(product.id)}')">Edit</button>
+        <button class="btn-delete" onclick="deleteProduct('${esc(product.id)}')">Delete</button>
       </div>
     </div>
   `).join('');
@@ -68,7 +73,7 @@ async function adjustStock(id, change) {
   const newStock = Math.max(0, product.stock + change); // Don't go below 0
   
   try {
-    const response = await fetch(`/api/products?id=${id}`, {
+    const response = await authFetch(`/api/products?id=${id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json'
@@ -122,7 +127,7 @@ document.getElementById('productForm').addEventListener('submit', async (e) => {
       });
       
       // Upload to Cloudinary via backend function
-      const uploadResponse = await fetch('/api/upload-image', {
+      const uploadResponse = await authFetch('/api/upload-image', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -161,7 +166,7 @@ document.getElementById('productForm').addEventListener('submit', async (e) => {
     const url = editingId ? `/api/products?id=${editingId}` : '/api/products';
     const method = editingId ? 'PUT' : 'POST';
     
-    const response = await fetch(url, {
+    const response = await authFetch(url, {
       method: method,
       headers: {
         'Content-Type': 'application/json'
@@ -218,7 +223,7 @@ async function deleteProduct(id) {
   if (!confirm('Are you sure you want to delete this product?')) return;
 
   try {
-    const response = await fetch(`/api/products?id=${id}`, {
+    const response = await authFetch(`/api/products?id=${id}`, {
       method: 'DELETE'
     });
 
@@ -246,13 +251,13 @@ function resetForm() {
 document.getElementById('cancelBtn').addEventListener('click', resetForm);
 
 // Initial load
-loadProducts();
+if (isLoggedIn()) loadProducts();
 
 
 // Load and display orders
 async function loadOrders() {
   try {
-    const response = await fetch('/api/orders');
+    const response = await authFetch('/api/orders');
     const orders = await response.json();
     displayOrders(orders);
   } catch (error) {
@@ -275,7 +280,7 @@ function displayOrders(orders) {
     <div class="order-card">
       <div class="order-header">
         <div>
-          <strong>Order #${order.orderId}</strong>
+          <strong>Order #${esc(order.orderId)}</strong>
           <span class="order-date">${new Date(order.createdAt).toLocaleString()}</span>
         </div>
         <span class="order-status status-${order.status}">${order.status.toUpperCase()}</span>
@@ -283,27 +288,27 @@ function displayOrders(orders) {
       <div class="order-body">
         <div class="order-customer">
           <h4>Customer Details</h4>
-          <p><strong>${order.customer.name}</strong></p>
-          <p>📞 ${order.customer.phone}</p>
-          ${order.customer.email ? `<p>📧 ${order.customer.email}</p>` : ''}
+          <p><strong>${esc(order.customer.name)}</strong></p>
+          <p>📞 ${esc(order.customer.phone)}</p>
+          ${order.customer.email ? `<p>📧 ${esc(order.customer.email)}</p>` : ''}
         </div>
         <div class="order-address">
           <h4>Delivery Address</h4>
-          <p>${order.address.line1}</p>
-          ${order.address.line2 ? `<p>${order.address.line2}</p>` : ''}
-          <p>${order.address.city}, ${order.address.state} - ${order.address.pincode}</p>
-          ${order.address.landmark ? `<p>Landmark: ${order.address.landmark}</p>` : ''}
+          <p>${esc(order.address.line1)}</p>
+          ${order.address.line2 ? `<p>${esc(order.address.line2)}</p>` : ''}
+          <p>${esc(order.address.city)}, ${esc(order.address.state)} - ${esc(order.address.pincode)}</p>
+          ${order.address.landmark ? `<p>Landmark: ${esc(order.address.landmark)}</p>` : ''}
         </div>
         <div class="order-items">
           <h4>Items</h4>
           ${order.items.map(item => `
-            <p>${item.name} x ${item.quantity} = ₹${(item.price * item.quantity).toFixed(2)}</p>
+            <p>${esc(item.name)} x ${esc(item.quantity)} = ₹${esc((item.price * item.quantity).toFixed(2))}</p>
           `).join('')}
           <p class="order-total"><strong>Total: ₹${order.total.toFixed(2)}</strong></p>
         </div>
       </div>
       <div class="order-actions">
-        <select onchange="updateOrderStatus('${order.orderId}', this.value)" class="status-select">
+        <select onchange="updateOrderStatus('${esc(order.orderId)}', this.value)" class="status-select">
           <option value="pending" ${order.status === 'pending' ? 'selected' : ''}>Pending</option>
           <option value="confirmed" ${order.status === 'confirmed' ? 'selected' : ''}>Confirmed</option>
           <option value="shipped" ${order.status === 'shipped' ? 'selected' : ''}>Shipped</option>
@@ -317,7 +322,7 @@ function displayOrders(orders) {
 
 async function updateOrderStatus(orderId, status) {
   try {
-    const response = await fetch(`/api/orders?orderId=${orderId}`, {
+    const response = await authFetch(`/api/orders?orderId=${orderId}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ status })
@@ -333,10 +338,10 @@ async function updateOrderStatus(orderId, status) {
 }
 
 // Load orders on page load
-loadOrders();
+if (isLoggedIn()) loadOrders();
 
 // Refresh orders every 30 seconds
-setInterval(loadOrders, 30000);
+setInterval(() => { if (isLoggedIn()) loadOrders(); }, 30000);
 
 
 // Track last order count for notifications
@@ -365,7 +370,7 @@ function playNotificationSound() {
 // Enhanced order loading with notification
 async function loadOrdersWithNotification() {
   try {
-    const response = await fetch('/api/orders');
+    const response = await authFetch('/api/orders');
     const orders = await response.json();
     
     // Check for new orders
@@ -394,16 +399,9 @@ if (Notification.permission === 'default') {
 }
 
 // Replace the interval with notification-enabled version
-setInterval(loadOrdersWithNotification, 30000);
+setInterval(() => { if (isLoggedIn()) loadOrdersWithNotification(); }, 30000);
 
 // Initial load with notification setup
-loadOrdersWithNotification();
+if (isLoggedIn()) loadOrdersWithNotification();
 
 
-// Logout function — defined in admin.html, referenced here for safety
-if (typeof logout === 'undefined') {
-  function logout() {
-    localStorage.removeItem('adminAuth');
-    window.location.reload();
-  }
-}

@@ -1,23 +1,17 @@
 const cloudinary = require('cloudinary').v2;
+const { isAdmin, unauthorized, JSON_HEADERS } = require('../lib/auth');
 
 // Configure Cloudinary
 cloudinary.config({
-  cloud_name: 'duqkjg5me',
-  api_key: '299332211855378',
-  api_secret: 'jEPEp_8p4YkjLj6Q4P822WrUS44'
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
 exports.handler = async (event, context) => {
-  const headers = {
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Methods': 'POST',
-    'Access-Control-Allow-Headers': 'Content-Type',
-    'Content-Type': 'application/json'
-  };
+  const headers = JSON_HEADERS;
 
-  if (event.httpMethod === 'OPTIONS') {
-    return { statusCode: 200, headers, body: '' };
-  }
+  if (!isAdmin(event)) return unauthorized();
 
   if (event.httpMethod !== 'POST') {
     return {
@@ -29,6 +23,9 @@ exports.handler = async (event, context) => {
 
   try {
     const { image, productId } = JSON.parse(event.body);
+    if (typeof image !== 'string' || !image.startsWith('data:image/')) {
+      return { statusCode: 400, headers, body: JSON.stringify({ error: 'Only image uploads are allowed' }) };
+    }
     
     if (!image) {
       return {
@@ -43,7 +40,7 @@ exports.handler = async (event, context) => {
       folder: 'house-of-elleora',
       public_id: `product-${productId}`,
       overwrite: true,
-      resource_type: 'auto'
+      resource_type: 'image'
     });
 
     return {
@@ -60,9 +57,7 @@ exports.handler = async (event, context) => {
       statusCode: 500,
       headers,
       body: JSON.stringify({ 
-        error: 'Failed to upload image',
-        details: error.message 
-      })
+        error: 'Failed to upload image' })
     };
   }
 };

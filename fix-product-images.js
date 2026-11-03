@@ -4,9 +4,9 @@ const path = require('path');
 
 // Configure Cloudinary with your credentials
 cloudinary.config({
-  cloud_name: 'duqkjg5me',
-  api_key: '299332211855378',
-  api_secret: 'jEPEp_8p4YkjLj6Q4P822WrUS44'
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
 async function fixProductImages() {

@@ -1,3 +1,8 @@
+// Escape text before putting it into HTML
+function esc(value) {
+  return String(value ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+
 // Enhanced House of Elleora - Feature-rich version
 let allProducts = [];
 let currentFilter = 'all';
@@ -555,13 +560,13 @@ function displayReviews(productId) {
       <div class="review-item">
         <div class="review-header">
           <div>
-            <span class="reviewer-name">${review.name}</span>
+            <span class="reviewer-name">${esc(review.name)}</span>
             ${review.verified ? '<span class="verified-badge">✓ Verified</span>' : ''}
           </div>
           <span class="review-date">${new Date(review.date).toLocaleDateString()}</span>
         </div>
         <div class="review-stars">${getStarDisplay(review.rating)}</div>
-        <div class="review-text">${review.text}</div>
+        <div class="review-text">${esc(review.text)}</div>
       </div>
     `).join('')}
   `;

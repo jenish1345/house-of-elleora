@@ -207,8 +207,27 @@
 
   <script>
     // ── Auth helpers ──────────────────────────────────────────────
+    // The server checks the username/password and returns a signed token.
+    // Every admin API call sends that token; the server rejects calls without it.
+    function getToken() {
+      return sessionStorage.getItem('adminToken');
+    }
+
     function isLoggedIn() {
-      return localStorage.getItem('adminAuth') === 'true';
+      const token = getToken();
+      return !!token && Number(token.split('.')[0]) > Date.now();
+    }
+
+    async function authFetch(url, options = {}) {
+      const response = await fetch(url, {
+        ...options,
+        headers: { ...(options.headers || {}), Authorization: `Bearer ${getToken()}` }
+      });
+      if (response.status === 401) {
+        logout();
+        throw new Error('Session expired. Please log in again.');
+      }
+      return response;
     }
 
     function showDashboard() {
@@ -217,7 +236,7 @@
     }
 
     function logout() {
-      localStorage.removeItem('adminAuth');
+      sessionStorage.removeItem('adminToken');
       document.getElementById('dashboard').style.display = 'none';
       document.getElementById('loginScreen').style.display = 'flex';
       document.getElementById('username').value = '';
@@ -226,16 +245,28 @@
     }
 
     // ── Login form ────────────────────────────────────────────────
-    document.getElementById('loginForm').addEventListener('submit', (e) => {
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       const username = document.getElementById('username').value.trim();
       const password = document.getElementById('password').value;
 
-      if (username === 'elleora' && password === 'elleora2026') {
-        localStorage.setItem('adminAuth', 'true');
+      try {
+        const response = await fetch('/api/admin-login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+        if (!response.ok) {
+          document.getElementById('loginError').textContent = '❌ Invalid username or password';
+          return;
+        }
+        const { token } = await response.json();
+        sessionStorage.setItem('adminToken', token);
         showDashboard();
-      } else {
-        document.getElementById('loginError').textContent = '❌ Invalid username or password';
+        if (typeof loadProducts === 'function') loadProducts();
+        if (typeof loadOrdersWithNotification === 'function') loadOrdersWithNotification();
+      } catch (error) {
+        document.getElementById('loginError').textContent = '❌ Could not reach the server. Try again.';
       }
     });
 

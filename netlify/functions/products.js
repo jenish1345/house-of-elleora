@@ -1,21 +1,40 @@
 const { Pool } = require('pg');
+const { isAdmin, unauthorized, JSON_HEADERS } = require('../lib/auth');
 
 // All 115 products as fallback (used only if database is completely unreachable)
 const FALLBACK_PRODUCTS = require('./products-data.json');
 
-// Database connection - use env variable or fallback to hardcoded connection
-const DB_URL = process.env.POSTGRES_URL || 'postgres://c0135a2403d9e2c9d6d193fb61c9735758a21ea8294c1981f649f4e7f551c6ed:sk_zOltAe07ew_IgXJNjPIME@db.prisma.io:5432/postgres?sslmode=require';
+// Database connection - set POSTGRES_URL in Netlify environment variables
+const DB_URL = process.env.POSTGRES_URL;
+
+function validateProduct(p) {
+  if (!p || typeof p.name !== 'string' || !p.name.trim() || p.name.length > 200) return 'Invalid name';
+  if (p.description != null && (typeof p.description !== 'string' || p.description.length > 5000)) return 'Invalid description';
+  if (!(Number(p.price) >= 0) || Number(p.price) > 1000000) return 'Invalid price';
+  if (!Number.isInteger(Number(p.stock)) || Number(p.stock) < 0) return 'Invalid stock';
+  if (p.image != null && (typeof p.image !== 'string' || !p.image.startsWith('https://'))) return 'Invalid image URL';
+  return null;
+}
 
 exports.handler = async (event, context) => {
-  const headers = {
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE',
-    'Access-Control-Allow-Headers': 'Content-Type',
-    'Content-Type': 'application/json'
-  };
+  const headers = { ...JSON_HEADERS, 'Cache-Control': 'public, max-age=60' };
 
-  if (event.httpMethod === 'OPTIONS') {
-    return { statusCode: 200, headers, body: '' };
+  // Only GET is public; adding, editing and deleting products is admin-only
+  if (event.httpMethod !== 'GET') {
+    if (!isAdmin(event)) return unauthorized();
+    if (!['POST', 'PUT', 'DELETE'].includes(event.httpMethod)) {
+      return { statusCode: 405, headers, body: JSON.stringify({ error: 'Method not allowed' }) };
+    }
+    if (event.httpMethod !== 'DELETE') {
+      let parsed;
+      try {
+        parsed = JSON.parse(event.body || '{}');
+      } catch {
+        return { statusCode: 400, headers, body: JSON.stringify({ error: 'Invalid JSON' }) };
+      }
+      const invalid = validateProduct(parsed);
+      if (invalid) return { statusCode: 400, headers, body: JSON.stringify({ error: invalid }) };
+    }
   }
 
   const pool = new Pool({
@@ -135,7 +154,7 @@ exports.handler = async (event, context) => {
     return {
       statusCode: 500,
       headers,
-      body: JSON.stringify({ error: error.message })
+      body: JSON.stringify({ error: 'Something went wrong. Please try again.' })
     };
   } finally {
     await pool.end();
