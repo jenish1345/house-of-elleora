@@ -1,16 +1,14 @@
-const { connectLambda, getStore } = require('@netlify/blobs');
+const { getStore } = require('@netlify/blobs');
 
 // Shop data lives in Netlify Blobs (built into Netlify, no extra account or keys).
 // "shop" store: key "products" -> array of products, key "orders" -> array of orders.
 // "images" store: uploaded product photos.
 
-function shopStore(event) {
-  connectLambda(event);
+function shopStore() {
   return getStore({ name: 'shop', consistency: 'strong' });
 }
 
-function imageStore(event) {
-  connectLambda(event);
+function imageStore() {
   return getStore({ name: 'images', consistency: 'strong' });
 }
 

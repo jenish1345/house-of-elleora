@@ -52,13 +52,11 @@ exports.handler = async (event, context) => {
   }
 
   try {
-    const store = shopStore(event);
-
     // ── GET ──────────────────────────────────────────────────────────────
     if (event.httpMethod === 'GET') {
       let products;
       try {
-        products = await readList(store, 'products');
+        products = await readList(shopStore(), 'products');
       } catch (storeError) {
         console.error('Store error on GET, using fallback:', storeError.message);
         products = [];
@@ -75,6 +73,7 @@ exports.handler = async (event, context) => {
       return { statusCode: 200, headers, body: JSON.stringify(visible) };
     }
 
+    const store = shopStore();
     const products = await readList(store, 'products');
 
     // ── POST (add new product) ────────────────────────────────────────────

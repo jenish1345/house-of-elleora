@@ -8,7 +8,7 @@ exports.handler = async (event, context) => {
   }
 
   try {
-    const result = await imageStore(event).getWithMetadata(key, { type: 'arrayBuffer' });
+    const result = await imageStore().getWithMetadata(key, { type: 'arrayBuffer' });
     if (!result) return { statusCode: 404, body: 'Image not found' };
 
     return {

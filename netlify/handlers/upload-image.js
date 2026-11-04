@@ -28,7 +28,7 @@ exports.handler = async (event, context) => {
     // Unique key per upload so browsers never show an old cached photo
     const safeId = String(productId || 'new').replace(/[^a-zA-Z0-9_-]/g, '').slice(0, 40);
     const key = `product-${safeId}-${Date.now()}`;
-    await imageStore(event).set(key, bytes, { metadata: { contentType: match[1] } });
+    await imageStore().set(key, bytes, { metadata: { contentType: match[1] } });
 
     return {
       statusCode: 200,

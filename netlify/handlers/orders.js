@@ -56,7 +56,7 @@ exports.handler = async (event, context) => {
   }
 
   try {
-    const store = shopStore(event);
+    const store = shopStore();
     const orders = await readList(store, 'orders');
 
     if (event.httpMethod === 'GET') {
