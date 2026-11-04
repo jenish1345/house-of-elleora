@@ -1,52 +1,26 @@
-# 🌸 House of Elleora
+# House of Elleora
 
-**"Her Aura, Her Charm"**
+Online shop for women's accessories: https://houseofelleora.netlify.app
 
-Welcome to House of Elleora - Your destination for elegant women's accessories!
+## How it works
 
-## 🛍️ Shop Our Collection
+- `public/`: the website (shop page `index.html`, admin page `admin.html`)
+- `netlify/functions/`: the API (`/api/products`, `/api/orders`, `/api/upload-image`, `/api/admin-login`)
+- `netlify.toml`: Netlify build settings, security headers, caching
+- Deploys automatically when you push to `main` on GitHub
 
-Browse our beautiful collection of:
-- 💎 Hair Clips
-- 👑 Hairbands  
-- 💫 Earrings
-- ✨ Bracelets
+## Environment variables (set in Netlify, never in code)
 
-## 📦 Shipping & Delivery
+| Name | What it is |
+|---|---|
+| `POSTGRES_URL` | Database connection link |
+| `CLOUDINARY_CLOUD_NAME` / `CLOUDINARY_API_KEY` / `CLOUDINARY_API_SECRET` | Image hosting |
+| `ADMIN_USERNAME` / `ADMIN_PASSWORD` | Admin page login |
+| `ADMIN_TOKEN_SECRET` | Random string used to sign admin sessions |
 
-- **₹40 Delivery Charges** for all orders
-- **FREE Delivery** on orders above ₹1000
-- Fast and secure delivery to your doorstep
+## Scripts
 
-## 💳 Payment
+Need `POSTGRES_URL` set in your terminal first.
 
-- Secure UPI payment (Google Pay, PhonePe, Paytm)
-- **No Cash on Delivery (COD)**
-- 100% safe and encrypted transactions
-
-## 📞 Contact Us
-
-- **Phone/WhatsApp:** +91 9488639502
-- **Email:** info@houseofelleora.com
-- **Instagram:** [@house.of.elleora](https://www.instagram.com/house.of.elleora)
-
-## 🌟 Why Choose Us?
-
-- Handpicked quality accessories
-- Affordable prices
-- Fast delivery
-- Excellent customer service
-- Easy returns
-
-## 💬 Get in Touch
-
-Have questions? Reach out to us:
-- Click the WhatsApp button on our website
-- Call us at +91 9488639502
-- DM us on Instagram
-
----
-
-Made with ❤️ for every woman who loves to accessorize!
-
-© 2026 House of Elleora. All rights reserved.
+- `npm run seed`: load `netlify/functions/products-data.json` into the database
+- `npm run export`: download all products from the database into `products.json`

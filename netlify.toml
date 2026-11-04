@@ -3,6 +3,16 @@
   publish = "public"
   functions = "netlify/functions"
 
+# Admin login: max 5 tries per minute per IP (slows down password guessing)
+[[redirects]]
+  from = "/api/admin-login"
+  to = "/.netlify/functions/admin-login"
+  status = 200
+  [redirects.rate_limit]
+    window_limit = 5
+    window_size = 60
+    aggregate_by = ["ip", "domain"]
+
 [[redirects]]
   from = "/api/*"
   to = "/.netlify/functions/:splat"

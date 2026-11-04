@@ -1,3 +1,9 @@
+// Ask Cloudinary for a resized, compressed copy (WebP/AVIF where supported)
+function cdn(url, width) {
+  if (typeof url !== 'string' || !url.includes('res.cloudinary.com') || !url.includes('/upload/')) return url;
+  return url.replace('/upload/', `/upload/f_auto,q_auto,w_${width}/`);
+}
+
 // Escape text before putting it into HTML
 function esc(value) {
   return String(value ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -73,7 +79,7 @@ function displayProducts() {
         ${isLowStock ? `<span class="badge badge-low-stock">Only ${product.stock} left!</span>` : ''}
         
         <div class="product-image-wrapper" onclick="openQuickView('${product.id}')">
-          <img src="${product.image}" 
+          <img src="${cdn(product.image, 600)}" 
                alt="${product.name}" 
                class="product-image" 
                loading="lazy"
@@ -208,7 +214,7 @@ function renderQuickView(product) {
   const modal = document.getElementById('quickViewModal');
   if (!modal) return;
 
-  document.getElementById('quickViewImage').src = product.image;
+  document.getElementById('quickViewImage').src = cdn(product.image, 1000);
   document.getElementById('quickViewName').textContent = product.name;
   document.getElementById('quickViewCategory').textContent = product.category;
   document.getElementById('quickViewPrice').textContent = `₹${product.price}`;
@@ -354,7 +360,7 @@ function displayWishlist() {
   
   container.innerHTML = wishlist.map(item => `
     <div class="wishlist-item">
-      <img src="${item.image}" alt="${item.name}" class="wishlist-item-image">
+      <img src="${cdn(item.image, 200)}" loading="lazy" alt="${item.name}" class="wishlist-item-image">
       <div class="wishlist-item-details">
         <div class="wishlist-item-category">${item.category}</div>
         <div class="wishlist-item-name">${item.name}</div>

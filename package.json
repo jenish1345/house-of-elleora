@@ -1,19 +1,14 @@
 {
   "name": "house-of-elleora",
   "version": "1.0.0",
+  "private": true,
   "description": "House of Elleora - Women's accessories shop website",
-  "main": "server.js",
   "scripts": {
-    "start": "node server.js",
-    "dev": "node server.js"
+    "seed": "node scripts/seed-products.js",
+    "export": "node scripts/export-all-products.js"
   },
   "dependencies": {
-    "@vercel/postgres": "^0.10.0",
     "cloudinary": "^2.9.0",
-    "express": "^4.18.2",
-    "multer": "^1.4.5-lts.1",
-    "node-fetch": "^2.7.0",
-    "nodemailer": "^6.9.7",
     "pg": "^8.20.0"
   }
 }

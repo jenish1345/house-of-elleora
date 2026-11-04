@@ -38,7 +38,7 @@ async function seedProducts() {
     console.log('✅ Table ready\n');
 
     // Read products from JSON
-    const productsPath = path.join(__dirname, 'products.json');
+    const productsPath = path.join(__dirname, '..', 'netlify', 'functions', 'products-data.json');
     const products = JSON.parse(fs.readFileSync(productsPath, 'utf8'));
 
     console.log(`📦 Found ${products.length} product(s) to seed\n`);

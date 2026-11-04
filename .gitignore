@@ -10,3 +10,6 @@ ADMIN_CREDENTIALS.txt
 NOTIFICATIONS_GUIDE.md
 SETUP.md
 START_HERE.md
+
+# Local Netlify folder
+.netlify
