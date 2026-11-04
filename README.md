@@ -9,18 +9,19 @@ Online shop for women's accessories: https://houseofelleora.netlify.app
 - `netlify.toml`: Netlify build settings, security headers, caching
 - Deploys automatically when you push to `main` on GitHub
 
+## Where data is stored
+
+Everything is in **Netlify Blobs** (built into Netlify, no extra accounts or keys):
+
+- store `shop`, key `products`: list of products
+- store `shop`, key `orders`: list of orders
+- store `images`: product photos uploaded from the admin page (served at `/api/image?key=...`)
+
+Older product photos still load from their Cloudinary links.
+
 ## Environment variables (set in Netlify, never in code)
 
 | Name | What it is |
 |---|---|
-| `POSTGRES_URL` | Database connection link |
-| `CLOUDINARY_CLOUD_NAME` / `CLOUDINARY_API_KEY` / `CLOUDINARY_API_SECRET` | Image hosting |
 | `ADMIN_USERNAME` / `ADMIN_PASSWORD` | Admin page login |
 | `ADMIN_TOKEN_SECRET` | Random string used to sign admin sessions |
-
-## Scripts
-
-Need `POSTGRES_URL` set in your terminal first.
-
-- `npm run seed`: load `netlify/functions/products-data.json` into the database
-- `npm run export`: download all products from the database into `products.json`

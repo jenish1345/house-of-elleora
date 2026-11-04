@@ -1,12 +1,8 @@
-const cloudinary = require('cloudinary').v2;
 const { isAdmin, unauthorized, JSON_HEADERS } = require('../lib/auth');
+const { imageStore } = require('../lib/store');
 
-// Configure Cloudinary
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET
-});
+const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+const MAX_BYTES = 4 * 1024 * 1024;
 
 exports.handler = async (event, context) => {
   const headers = JSON_HEADERS;
@@ -14,50 +10,33 @@ exports.handler = async (event, context) => {
   if (!isAdmin(event)) return unauthorized();
 
   if (event.httpMethod !== 'POST') {
-    return {
-      statusCode: 405,
-      headers,
-      body: JSON.stringify({ error: 'Method not allowed' })
-    };
+    return { statusCode: 405, headers, body: JSON.stringify({ error: 'Method not allowed' }) };
   }
 
   try {
-    const { image, productId } = JSON.parse(event.body);
-    if (typeof image !== 'string' || !image.startsWith('data:image/')) {
-      return { statusCode: 400, headers, body: JSON.stringify({ error: 'Only image uploads are allowed' }) };
-    }
-    
-    if (!image) {
-      return {
-        statusCode: 400,
-        headers,
-        body: JSON.stringify({ error: 'No image provided' })
-      };
+    const { image, productId } = JSON.parse(event.body || '{}');
+    const match = typeof image === 'string' && image.match(/^data:(image\/[a-z]+);base64,(.+)$/);
+    if (!match || !ALLOWED_TYPES.includes(match[1])) {
+      return { statusCode: 400, headers, body: JSON.stringify({ error: 'Only JPG, PNG, WebP or GIF images are allowed' }) };
     }
 
-    // Upload to Cloudinary
-    const result = await cloudinary.uploader.upload(image, {
-      folder: 'house-of-elleora',
-      public_id: `product-${productId}`,
-      overwrite: true,
-      resource_type: 'image'
-    });
+    const bytes = Buffer.from(match[2], 'base64');
+    if (bytes.length > MAX_BYTES) {
+      return { statusCode: 413, headers, body: JSON.stringify({ error: 'Image is too large (max 4 MB)' }) };
+    }
+
+    // Unique key per upload so browsers never show an old cached photo
+    const safeId = String(productId || 'new').replace(/[^a-zA-Z0-9_-]/g, '').slice(0, 40);
+    const key = `product-${safeId}-${Date.now()}`;
+    await imageStore(event).set(key, bytes, { metadata: { contentType: match[1] } });
 
     return {
       statusCode: 200,
       headers,
-      body: JSON.stringify({
-        success: true,
-        url: result.secure_url
-      })
+      body: JSON.stringify({ success: true, url: `/api/image?key=${key}` })
     };
   } catch (error) {
-    console.error('Cloudinary upload error:', error);
-    return {
-      statusCode: 500,
-      headers,
-      body: JSON.stringify({ 
-        error: 'Failed to upload image' })
-    };
+    console.error('Image upload error:', error);
+    return { statusCode: 500, headers, body: JSON.stringify({ error: 'Failed to upload image' }) };
   }
 };

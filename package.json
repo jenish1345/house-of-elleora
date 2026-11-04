@@ -3,12 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "description": "House of Elleora - Women's accessories shop website",
-  "scripts": {
-    "seed": "node scripts/seed-products.js",
-    "export": "node scripts/export-all-products.js"
-  },
   "dependencies": {
-    "cloudinary": "^2.9.0",
-    "pg": "^8.20.0"
+    "@netlify/blobs": "^10.7.13"
   }
 }
