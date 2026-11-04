@@ -1,4 +1,9 @@
-const { getStore } = require('@netlify/blobs');
+// getStore is handed in by each function file (ESM import), so the bundler
+// always packs @netlify/blobs into the function.
+let getStore = null;
+function init(fn) {
+  getStore = fn;
+}
 
 // Shop data lives in Netlify Blobs (built into Netlify, no extra account or keys).
 // "shop" store: key "products" -> array of products, key "orders" -> array of orders.
@@ -20,4 +25,4 @@ async function writeList(store, key, list) {
   await store.setJSON(key, list);
 }
 
-module.exports = { shopStore, imageStore, readList, writeList };
+module.exports = { init, shopStore, imageStore, readList, writeList };
