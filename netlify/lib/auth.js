@@ -1,11 +1,14 @@
 const crypto = require('crypto');
 
 // Admin session tokens: "<expiry>.<hmac>", signed with ADMIN_TOKEN_SECRET.
-// Set ADMIN_USERNAME, ADMIN_PASSWORD and ADMIN_TOKEN_SECRET in Netlify env vars.
 const TOKEN_TTL_MS = 12 * 60 * 60 * 1000;
 
+function getEnv(key) {
+  return process.env[key.toUpperCase()] || process.env[key.toLowerCase()] || '';
+}
+
 function sign(value) {
-  const secret = process.env.ADMIN_TOKEN_SECRET;
+  const secret = getEnv('admin_token_secret');
   if (!secret) throw new Error('ADMIN_TOKEN_SECRET not set');
   return crypto.createHmac('sha256', secret).update(value).digest('hex');
 }
@@ -24,7 +27,9 @@ function createToken() {
 function isAdmin(event) {
   const header = event.headers?.authorization || event.headers?.Authorization || '';
   const token = header.replace(/^Bearer\s+/i, '');
-  const [expires, mac] = token.split('.');
+  const parts = token.split('.');
+  const expires = parts[0];
+  const mac = parts[1];
   if (!expires || !mac) return false;
   if (Number(expires) < Date.now()) return false;
   try {
@@ -35,11 +40,11 @@ function isAdmin(event) {
 }
 
 function checkCredentials(username, password) {
-  const u = process.env.ADMIN_USERNAME;
-  const p = process.env.ADMIN_PASSWORD;
+  const u = getEnv('admin_username');
+  const p = getEnv('admin_password');
   if (!u || !p) return false;
-  const okUser = safeEqual(username || '', u);
-  const okPass = safeEqual(password || '', p);
+  const okUser = safeEqual(String(username || '').trim().toLowerCase(), String(u).trim().toLowerCase());
+  const okPass = safeEqual(String(password || '').trim(), String(p).trim());
   return okUser && okPass;
 }
 
