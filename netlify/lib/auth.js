@@ -18,13 +18,15 @@ function safeEqual(a, b) {
 
 function createToken() {
   const expires = String(Date.now() + TOKEN_TTL_MS);
-  return ;
+  return expires + '.' + sign(expires);
 }
 
 function isAdmin(event) {
   const header = event.headers?.authorization || event.headers?.Authorization || '';
   const token = header.replace(/^Bearer\s+/i, '');
-  const [expires, mac] = token.split('.');
+  const parts = token.split('.');
+  const expires = parts[0];
+  const mac = parts[1];
   if (!expires || !mac) return false;
   if (Number(expires) < Date.now()) return false;
   try {
